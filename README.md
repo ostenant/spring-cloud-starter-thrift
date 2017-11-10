@@ -1,0 +1,1 @@
+## 提供SpringBoot对Apache Thrift远程RPC框架客户端/服务端的封装和集成
