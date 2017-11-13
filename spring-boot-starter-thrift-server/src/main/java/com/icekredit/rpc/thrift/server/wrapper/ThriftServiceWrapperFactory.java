@@ -24,8 +24,7 @@ public final class ThriftServiceWrapperFactory {
         thriftServiceWrapper.setIfaceType(thriftServiceIFace);
 
         final String signature = String.join("$", new String[]{
-                thriftServiceId,
-                thriftServiceIFace.getCanonicalName(),
+                thriftServiceId, thriftServiceIFace.getDeclaringClass().getName(),
                 String.valueOf(version)
         });
 
@@ -54,8 +53,7 @@ public final class ThriftServiceWrapperFactory {
         thriftServiceWrapper.setIfaceType(thriftServiceIFace);
 
         final String signature = String.join("$", new String[]{
-                thriftServiceId,
-                thriftServiceIFace.getCanonicalName(),
+                thriftServiceId, thriftServiceIFace.getDeclaringClass().getName(),
                 String.valueOf(version)
         });
 

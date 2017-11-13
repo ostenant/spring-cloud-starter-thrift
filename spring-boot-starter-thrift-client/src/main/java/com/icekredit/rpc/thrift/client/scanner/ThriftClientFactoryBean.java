@@ -1,6 +1,5 @@
 package com.icekredit.rpc.thrift.client.scanner;
 
-import com.icekredit.rpc.thrift.client.common.ThriftClientAware;
 import com.icekredit.rpc.thrift.client.common.ThriftServiceSignature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TServiceClient;
@@ -14,10 +13,9 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.TypeVariable;
 import java.util.Objects;
 
-public class ThriftClientFactoryBean<T extends ThriftClientAware> implements FactoryBean<T>, InitializingBean {
+public class ThriftClientFactoryBean<T> implements FactoryBean<T>, InitializingBean {
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -26,6 +24,8 @@ public class ThriftClientFactoryBean<T extends ThriftClientAware> implements Fac
     private Class<?> beanClass;
 
     private String beanClassName;
+
+    private Class<?> serviceClass;
 
     private ThriftServiceSignature serviceSignature;
 
@@ -36,23 +36,13 @@ public class ThriftClientFactoryBean<T extends ThriftClientAware> implements Fac
     @Override
     @SuppressWarnings("unchecked")
     public T getObject() throws Exception {
-        if (Objects.isNull(beanClass)) {
-            beanClass = Class.forName(beanName);
-        }
-
         if (beanClass.isInterface()) {
-            log.info("Ready to generate proxy with JDK");
+            log.info("Prepare to generate proxy for {} with JDK", beanClass.getName());
 
-            return (T) Proxy.newProxyInstance(
-                    beanClass.getClassLoader(),
-                    beanClass.getInterfaces(),
-                    (proxy, method, args) -> {
-                        Object result = method.invoke(proxy, args);
-                        return result;
-                    }
-            );
+            ThriftClientInvocationHandler invocationHandler = new ThriftClientInvocationHandler(serviceSignature, clientClass, clientConstructor);
+            return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?>[]{beanClass}, invocationHandler);
         } else {
-            log.info("Ready to generate proxy with Cglib");
+            log.info("Prepare to generate proxy for {} with Cglib", beanClass.getName());
 
             Enhancer enhancer = new Enhancer();
             enhancer.setSuperclass(beanClass);
@@ -60,8 +50,7 @@ public class ThriftClientFactoryBean<T extends ThriftClientAware> implements Fac
             enhancer.setUseFactory(true);
 
             MethodInterceptor callback = (target, method, args, methodProxy) -> {
-                Object result = methodProxy.invokeSuper(target, args);
-                return result;
+                return methodProxy.invokeSuper(target, args);
             };
 
             enhancer.setCallback(callback);
@@ -73,39 +62,36 @@ public class ThriftClientFactoryBean<T extends ThriftClientAware> implements Fac
     @Override
     public Class<?> getObjectType() {
         if (Objects.isNull(beanClass) && StringUtils.isBlank(beanName)) {
-            log.info("Bean class is not found");
+            log.warn("Bean class is not found");
             return null;
         }
 
-        if (Objects.isNull(beanClass)) {
-            log.info("Bean class is: {}", beanClass.getName());
+        if (Objects.nonNull(beanClass)) {
             return beanClass;
         }
 
         if (StringUtils.isNotBlank(beanClassName)) {
             try {
                 beanClass = Class.forName(beanClassName);
-                log.info("Bean class is: {}", beanClassName);
                 return beanClass;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        } else {
+            log.warn("Bean class is not found");
         }
 
-        log.info("Bean class is not found");
         return null;
     }
 
     @Override
     public boolean isSingleton() {
-        TypeVariable<?> typeVariable = this.getClass().getTypeParameters()[0];
-        log.info("ThriftClientFactoryBean<{}> is in singleton pattern", typeVariable.getName());
         return true;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.info("Success to Instantiate a bean of ThriftClientFactoryBean<{}>");
+        log.info("Succeed to instantiate an instance of ThriftClientFactoryBean: {}", this);
     }
 
     public String getBeanName() {
@@ -130,6 +116,14 @@ public class ThriftClientFactoryBean<T extends ThriftClientAware> implements Fac
 
     public void setBeanClassName(String beanClassName) {
         this.beanClassName = beanClassName;
+    }
+
+    public Class<?> getServiceClass() {
+        return serviceClass;
+    }
+
+    public void setServiceClass(Class<?> serviceClass) {
+        this.serviceClass = serviceClass;
     }
 
     public ThriftServiceSignature getServiceSignature() {

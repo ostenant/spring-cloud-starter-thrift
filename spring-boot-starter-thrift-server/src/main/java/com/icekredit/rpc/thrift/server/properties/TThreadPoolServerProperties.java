@@ -1,9 +1,7 @@
 package com.icekredit.rpc.thrift.server.properties;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConditionalOnProperty(prefix = "spring.thrift.server", name = "serviceModel", havingValue = "threadPool")
 @ConfigurationProperties(prefix = "spring.thrift.server.thread-pool")
 public class TThreadPoolServerProperties {
 

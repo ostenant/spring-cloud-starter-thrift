@@ -43,7 +43,7 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
 
     @Bean
     @ConditionalOnMissingBean
-    public ThriftServerGroup thriftServer(ThriftServerProperties properties) throws TTransportException, IOException {
+    public ThriftServerGroup thriftServerGroup(ThriftServerProperties properties) throws TTransportException, IOException {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(ThriftService.class);
         if (Objects.isNull(beanNames) || beanNames.length == 0) {
             log.error("Can not found any thrift service annotated with @ThriftService");
@@ -65,7 +65,6 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
         }).collect(Collectors.toList());
 
         AbstractThriftServerContext serverContext = new ThriftServerContext(properties, serviceWrappers);
-
         return new ThriftServerGroup(serverContext.buildServer());
     }
 

@@ -4,13 +4,13 @@ public class ThriftServiceSignature {
 
     private String thriftServiceId;
 
-    private Class<?> referClass;
+    private Class<?> thriftServiceClass;
 
     private double version;
 
-    public ThriftServiceSignature(String thriftServiceId, Class<?> referClass, double version) {
+    public ThriftServiceSignature(String thriftServiceId, Class<?> thriftServiceClass, double version) {
         this.thriftServiceId = thriftServiceId;
-        this.referClass = referClass;
+        this.thriftServiceClass = thriftServiceClass;
         this.version = version;
     }
 
@@ -22,12 +22,12 @@ public class ThriftServiceSignature {
         this.thriftServiceId = thriftServiceId;
     }
 
-    public Class<?> getReferClass() {
-        return referClass;
+    public Class<?> getThriftServiceClass() {
+        return thriftServiceClass;
     }
 
-    public void setReferClass(Class<?> referClass) {
-        this.referClass = referClass;
+    public void setThriftServiceClass(Class<?> thriftServiceClass) {
+        this.thriftServiceClass = thriftServiceClass;
     }
 
     public double getVersion() {
@@ -36,5 +36,12 @@ public class ThriftServiceSignature {
 
     public void setVersion(double version) {
         this.version = version;
+    }
+
+    public String marker() {
+        return String.join("$", new String[]{
+                thriftServiceId, thriftServiceClass.getName(),
+                String.valueOf(version)
+        });
     }
 }

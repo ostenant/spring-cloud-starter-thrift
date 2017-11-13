@@ -14,6 +14,7 @@ public class ThriftClientPropertiesCondition extends SpringBootCondition {
 
     private static final String SPRING_THRIFT_CLIENT = "spring.thrift.client.";
     private static final String SPRING_THRIFT_CLIENT_SERVICE_ID_LIST = "service-id-list";
+    private static final String SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN = "package-to-scan";
 
     @Override
     public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -22,7 +23,9 @@ public class ThriftClientPropertiesCondition extends SpringBootCondition {
 
         return new ConditionOutcome(MapUtils.isNotEmpty(properties)
                 && properties.containsKey(SPRING_THRIFT_CLIENT_SERVICE_ID_LIST)
-                && StringUtils.isNotBlank(MapUtils.getString(properties, SPRING_THRIFT_CLIENT_SERVICE_ID_LIST)
+                && StringUtils.isNotBlank(MapUtils.getString(properties, SPRING_THRIFT_CLIENT_SERVICE_ID_LIST))
+                && properties.containsKey(SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN)
+                && StringUtils.isNotBlank(MapUtils.getString(properties, SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN)
         ), "Thrift server service id list is " + MapUtils.getString(properties, SPRING_THRIFT_CLIENT_SERVICE_ID_LIST));
 
     }

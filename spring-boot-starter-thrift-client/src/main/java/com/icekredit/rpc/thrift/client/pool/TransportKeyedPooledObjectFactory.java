@@ -20,6 +20,7 @@ import java.util.Objects;
 public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFactory<ThriftServerNode, TTransport> {
 
     private Logger log = LoggerFactory.getLogger(getClass());
+
     private ThriftClientProperties properties;
 
     public TransportKeyedPooledObjectFactory(ThriftClientProperties properties) {

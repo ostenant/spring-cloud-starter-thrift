@@ -32,4 +32,9 @@ public final class ThriftClientDefinitionProperty {
      */
     public final static String BEAN_CLASS_NAME = "beanClassName";
 
+    /**
+     * Thrift Service类名称
+     */
+    public static final String SERVICE_CLASS = "serviceClass";
+
 }
