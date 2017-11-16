@@ -30,7 +30,6 @@ public class ThriftClientInvocationHandler implements InvocationHandler {
         this.proxyFactory = initializeProxyFactory();
     }
 
-
     @SuppressWarnings("unchecked")
     private ProxyFactory initializeProxyFactory() throws Exception {
         Constructor<?> constructor = clientConstructor;
@@ -39,12 +38,10 @@ public class ThriftClientInvocationHandler implements InvocationHandler {
         }
 
         Object target = BeanUtils.instantiateClass(constructor, (TProtocol) null);
-
         ProxyFactory proxyFactory = new ProxyFactory(target);
 
         ThriftClientAdvice clientAdvice = new ThriftClientAdvice(serviceSignature, clientConstructor);
         proxyFactory.addAdvice(clientAdvice);
-
         proxyFactory.setProxyTargetClass(true);
         proxyFactory.setFrozen(true);
 

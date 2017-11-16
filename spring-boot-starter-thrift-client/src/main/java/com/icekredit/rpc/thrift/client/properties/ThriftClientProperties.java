@@ -6,12 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ThriftClientProperties {
 
     /**
-     * 注册可用的服务名称/ID
-     * 多个服务ID用都好分割
-     */
-    private String serviceIdList;
-
-    /**
      * 服务模型(单线程/多线程/阻塞/非阻塞)
      * <p>
      * simple: 单线程阻塞模型
@@ -31,14 +25,6 @@ public class ThriftClientProperties {
      * 客户端扫描的包名称/多个子包用逗号分割
      */
     private final static String DEFAULT_PACKAGE_TO_SCAN = "";
-
-    public String getServiceIdList() {
-        return serviceIdList;
-    }
-
-    public void setServiceIdList(String serviceIdList) {
-        this.serviceIdList = serviceIdList;
-    }
 
     public String getServiceModel() {
         return serviceModel;

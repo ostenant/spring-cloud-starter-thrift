@@ -6,10 +6,13 @@ import java.util.Objects;
 
 public final class ThriftClientWrapperFactory {
 
+    private ThriftClientWrapperFactory() {
+    }
+
     public static ThriftClientWrapper wrapper(final String thriftServiceId, String thriftServiceName, Object thriftClient, double version) {
         ThriftClientWrapper thriftServiceWrapper;
 
-        if (version <= 0.0) {
+        if (version <= 0) {
             thriftServiceWrapper = new ThriftClientWrapper(thriftServiceName, thriftClient.getClass(), thriftClient);
         } else {
             thriftServiceWrapper = new ThriftClientWrapper(thriftServiceName, thriftClient.getClass(), thriftClient, version);

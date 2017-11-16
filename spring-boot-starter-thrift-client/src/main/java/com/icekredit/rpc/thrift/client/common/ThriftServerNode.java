@@ -1,16 +1,10 @@
 package com.icekredit.rpc.thrift.client.common;
 
-import java.util.concurrent.TimeUnit;
-
 public class ThriftServerNode {
 
     private String host;
 
     private int port;
-
-    private int timeout;
-
-    private TimeUnit timeUnit = TimeUnit.SECONDS;
 
     public ThriftServerNode() {
     }
@@ -18,34 +12,6 @@ public class ThriftServerNode {
     public ThriftServerNode(String host, int port) {
         this.host = host;
         this.port = port;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public TimeUnit getTimeUnit() {
-        return timeUnit;
     }
 
     @Override

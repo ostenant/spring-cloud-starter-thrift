@@ -27,7 +27,6 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
         this.properties = properties;
     }
 
-
     @Override
     public TTransport create(ThriftServerNode key) throws Exception {
         if (StringUtils.isBlank(key.getHost())) {
@@ -49,13 +48,11 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
         return transport;
     }
 
-
     @Override
     public PooledObject<TTransport> wrap(TTransport value) {
         SoftReference<TTransport> softReference = new SoftReference<>(value);
         return new PooledSoftReference<>(softReference);
     }
-
 
     @Override
     public boolean validateObject(ThriftServerNode key, PooledObject<TTransport> value) {
@@ -74,7 +71,6 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
             return false;
         }
     }
-
 
     @Override
     public void destroyObject(ThriftServerNode key, PooledObject<TTransport> value) throws Exception {

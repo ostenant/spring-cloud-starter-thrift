@@ -1,11 +1,14 @@
 package com.icekredit.rpc.thrift.client;
 
+import com.icekredit.rpc.thrift.client.common.ThriftClientContext;
 import com.icekredit.rpc.thrift.client.pool.TransportKeyedObjectPool;
 import com.icekredit.rpc.thrift.client.pool.TransportKeyedPooledObjectFactory;
+import com.icekredit.rpc.thrift.client.properties.ConsulPropertiesCondition;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientPoolProperties;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientProperties;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientPropertiesCondition;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +16,8 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Conditional(ThriftClientPropertiesCondition.class)
+@Conditional(value = {ConsulPropertiesCondition.class, ThriftClientPropertiesCondition.class})
+@ConditionalOnClass(name = {"org.springframework.cloud.consul.ConsulAutoConfiguration"})
 @EnableConfigurationProperties(ThriftClientProperties.class)
 public class ThriftClientAutoConfiguration {
 
@@ -24,15 +28,8 @@ public class ThriftClientAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public ThriftClientBeanPostProcessor thriftClientBeanPostProcessor() {
-        return new ThriftClientBeanPostProcessor();
-    }
-
-    @Bean
     public GenericKeyedObjectPoolConfig keyedObjectPoolConfig(ThriftClientProperties properties) {
         ThriftClientPoolProperties poolProperties = properties.getPool();
-
         GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
         config.setMaxIdlePerKey(poolProperties.getPoolMaxIdlePerKey());
         config.setMaxIdlePerKey(poolProperties.getPoolMaxIdlePerKey());
@@ -54,10 +51,22 @@ public class ThriftClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TransportKeyedObjectPool transportKeyedObjectPool(GenericKeyedObjectPoolConfig config,
-                                                             TransportKeyedPooledObjectFactory poolFactory) {
+    public TransportKeyedObjectPool transportKeyedObjectPool(
+            GenericKeyedObjectPoolConfig config, TransportKeyedPooledObjectFactory poolFactory) {
         return new TransportKeyedObjectPool(poolFactory, config);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public ThriftClientBeanPostProcessor thriftClientBeanPostProcessor() {
+        return new ThriftClientBeanPostProcessor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ThriftClientContext thriftClientContext(
+            ThriftClientProperties properties, TransportKeyedObjectPool objectPool) {
+        return ThriftClientContext.context(properties, objectPool);
+    }
 
 }

@@ -17,7 +17,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 public class ThriftClientBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware {
@@ -74,7 +73,6 @@ public class ThriftClientBeanPostProcessor implements BeanPostProcessor, Applica
                 injectedBean = applicationContext.getBean(fieldType, referName);
 
                 injectedBean = Optional.ofNullable(injectedBean)
-                        .filter(Objects::nonNull)
                         .orElseThrow(() -> new ThriftClientInstantiateException("Detected non-qualified bean with name {}" + referName));
 
                 ReflectionUtils.makeAccessible(field);
