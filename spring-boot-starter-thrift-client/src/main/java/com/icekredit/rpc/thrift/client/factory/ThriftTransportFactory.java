@@ -39,15 +39,13 @@ public class ThriftTransportFactory {
     }
 
     private static TTransport createTSocket(String serviceModel, ThriftServerNode serverNode) {
-        TTransport transport;
-        transport = new TSocket(serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout());
+        TTransport transport = new TSocket(serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout());
         log.info("Established a new socket transport, service model is {}", serviceModel);
         return transport;
     }
 
     private static TTransport createTFramedTransport(String serviceModel, ThriftServerNode serverNode) {
-        TTransport transport;
-        transport = new TFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout()));
+        TTransport transport = new TFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout()));
         log.info("Established a new framed transport, service model is {}", serviceModel);
         return transport;
     }

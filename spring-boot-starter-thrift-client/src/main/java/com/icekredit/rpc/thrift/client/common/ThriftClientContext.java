@@ -16,7 +16,7 @@ public class ThriftClientContext {
 
     public static ThriftClientContext context(ThriftClientProperties properties, TransportKeyedObjectPool objectPool) {
         if (context == null) {
-            synchronized (context) {
+            synchronized (ThriftClientContext.class) {
                 if (context == null) {
                     context = new ThriftClientContext();
                     context.properties = properties;

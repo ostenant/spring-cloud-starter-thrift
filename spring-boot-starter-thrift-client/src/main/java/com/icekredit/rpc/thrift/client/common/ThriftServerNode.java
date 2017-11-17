@@ -6,12 +6,44 @@ public class ThriftServerNode {
 
     private int port;
 
+    private int timeout;
+
     public ThriftServerNode() {
     }
 
     public ThriftServerNode(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+
+    public ThriftServerNode(String host, int port, int timeout) {
+        this(host, port);
+        this.timeout = timeout;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     @Override

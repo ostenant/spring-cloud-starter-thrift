@@ -21,7 +21,7 @@ public abstract class ThriftServerNodeList<T extends ThriftServerNode> implement
 
     @Override
     public Map<String, LinkedHashSet<T>> getUpdatedListOfThriftServers() {
-        return getThriftServers();
+        return refreshThriftServers();
     }
 
     public abstract List<T> getThriftServer(String serviceName);

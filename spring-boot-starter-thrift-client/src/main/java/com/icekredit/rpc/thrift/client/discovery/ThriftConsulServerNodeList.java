@@ -27,7 +27,20 @@ public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsu
     private final HealthClient healthClient;
     private final CatalogClient catalogClient;
 
-    ThriftConsulServerNodeList(Consul consul) {
+    private static ThriftConsulServerNodeList serverNodeList = null;
+
+    private ThriftConsulServerNodeList singleton(Consul consul) {
+        if (serverNodeList == null) {
+            synchronized (ThriftConsulServerNodeList.class) {
+                if (serverNodeList == null) {
+                    serverNodeList = new ThriftConsulServerNodeList(consul);
+                }
+            }
+        }
+        return serverNodeList;
+    }
+
+    private ThriftConsulServerNodeList(Consul consul) {
         this.consul = consul;
         this.healthClient = this.consul.healthClient();
         this.catalogClient = this.consul.catalogClient();

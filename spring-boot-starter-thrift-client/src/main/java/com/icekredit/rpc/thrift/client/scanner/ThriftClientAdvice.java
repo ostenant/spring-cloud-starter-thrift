@@ -44,14 +44,12 @@ public class ThriftClientAdvice implements MethodInterceptor {
     private TransportKeyedObjectPool objectPool;
 
 
-    ThriftClientAdvice(ThriftServiceSignature serviceSignature,
+    public ThriftClientAdvice(ThriftServiceSignature serviceSignature,
                               Constructor<? extends TServiceClient> clientConstructor) {
         this.serviceSignature = serviceSignature;
         this.clientConstructor = clientConstructor;
-
-        ThriftClientContext clientContext = ThriftClientContext.getContext();
-        this.properties = clientContext.getProperties();
-        this.objectPool = clientContext.getObjectPool();
+        this.properties = ThriftClientContext.getContext().getProperties();
+        this.objectPool = ThriftClientContext.getContext().getObjectPool();
     }
 
     @Override
