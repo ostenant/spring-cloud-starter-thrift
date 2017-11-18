@@ -78,12 +78,22 @@ public class ThriftConsulServerNode extends ThriftServerNode {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ThriftConsulServerNode that = (ThriftConsulServerNode) o;
+
+        if (getPort() != that.getPort()) return false;
+        return getHost() != null ? getHost().equals(that.getHost()) : that.getHost() == null;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int result = super.hashCode();
+        result = 31 * result + (getHost() != null ? getHost().hashCode() : 0);
+        result = 31 * result + getPort();
+        return result;
     }
 
     @Override

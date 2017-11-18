@@ -14,28 +14,38 @@ public class ThriftClientContext {
 
     private TransportKeyedObjectPool objectPool;
 
+    private String registryAddress;
+
     public static ThriftClientContext context(ThriftClientProperties properties, TransportKeyedObjectPool objectPool) {
+        context().properties = properties;
+        context().objectPool = objectPool;
+        return context;
+    }
+
+    public static ThriftClientContext context() {
         if (context == null) {
             synchronized (ThriftClientContext.class) {
                 if (context == null) {
                     context = new ThriftClientContext();
-                    context.properties = properties;
-                    context.objectPool = objectPool;
                 }
             }
         }
         return context;
     }
 
+    public static void registry(String registryAddress) {
+        context().registryAddress = registryAddress;
+    }
+
     public ThriftClientProperties getProperties() {
-        return properties;
+        return context.properties;
     }
 
     public TransportKeyedObjectPool getObjectPool() {
-        return objectPool;
+        return context.objectPool;
     }
 
-    public static ThriftClientContext getContext() {
-        return context;
+    public String getRegistryAddress() {
+        return context.registryAddress;
     }
 }

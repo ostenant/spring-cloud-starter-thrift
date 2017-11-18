@@ -15,37 +15,44 @@ public class ThriftTransportFactory {
 
     private static Logger log = LoggerFactory.getLogger(ThriftTransportFactory.class);
 
-    public static TTransport determineTTranport(String serviceModel, ThriftServerNode serverNode) {
+    private final static int CONNECT_TIMEOUT = 10;
+
+    public static TTransport determineTTranport(String serviceModel, ThriftServerNode serverNode, int connectTimeout) {
         if (StringUtils.equalsIgnoreCase(TServiceModel.SERVICE_MODEL_SIMPLE, serviceModel))
-            return createTSocket(serviceModel, serverNode);
+            return createTSocket(serviceModel, serverNode, connectTimeout);
 
         if (StringUtils.equalsIgnoreCase(TServiceModel.SERVICE_MODEL_THREAD_POOL, serviceModel))
-            return createTSocket(serviceModel, serverNode);
+            return createTSocket(serviceModel, serverNode, connectTimeout);
 
         if (StringUtils.equalsIgnoreCase(TServiceModel.SERVICE_MODEL_NON_BLOCKING, serviceModel))
-            return createTFramedTransport(serviceModel, serverNode);
+            return createTFramedTransport(serviceModel, serverNode, connectTimeout);
 
         if (StringUtils.equalsIgnoreCase(TServiceModel.SERVICE_MODEL_HS_HA, serviceModel))
-            return createTFramedTransport(serviceModel, serverNode);
+            return createTFramedTransport(serviceModel, serverNode, connectTimeout);
 
 
         if (StringUtils.equalsIgnoreCase(TServiceModel.SERVICE_MODEL_THREADED_SELECTOR, serviceModel))
-            return createTFramedTransport(serviceModel, serverNode);
+            return createTFramedTransport(serviceModel, serverNode, connectTimeout);
 
         if (StringUtils.equalsIgnoreCase(TServiceModel.SERVICE_MODEL_DEFAULT, serviceModel))
-            return createTFramedTransport(serviceModel, serverNode);
+            return createTFramedTransport(serviceModel, serverNode, connectTimeout);
 
         throw new ThriftClientConfigException("Service model is configured in wrong way");
     }
 
-    private static TTransport createTSocket(String serviceModel, ThriftServerNode serverNode) {
-        TTransport transport = new TSocket(serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout());
+    public static TTransport determineTTranport(String serviceModel, ThriftServerNode serverNode) {
+        return determineTTranport(serviceModel, serverNode, CONNECT_TIMEOUT);
+    }
+
+    private static TTransport createTSocket(String serviceModel, ThriftServerNode serverNode, int connectTimeout) {
+        TTransport transport = new TSocket(serverNode.getHost(), serverNode.getPort(), connectTimeout > 0 ? connectTimeout : CONNECT_TIMEOUT);
         log.info("Established a new socket transport, service model is {}", serviceModel);
         return transport;
     }
 
-    private static TTransport createTFramedTransport(String serviceModel, ThriftServerNode serverNode) {
-        TTransport transport = new TFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout()));
+    private static TTransport createTFramedTransport(String serviceModel, ThriftServerNode serverNode, int connectTimeout) {
+        TTransport transport = new TFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort(),
+                connectTimeout > 0 ? connectTimeout : CONNECT_TIMEOUT));
         log.info("Established a new framed transport, service model is {}", serviceModel);
         return transport;
     }

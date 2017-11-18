@@ -53,7 +53,7 @@ public class ThriftConsulServerUtils {
     public static boolean isPassingCheck(ServiceHealth serviceHealth) {
         List<HealthCheck> healthChecks = serviceHealth.getChecks();
         for (HealthCheck healthCheck : healthChecks) {
-            if (StringUtils.endsWithIgnoreCase(healthCheck.getStatus(), CHECK_STATUS_PASSING)) {
+            if (!CHECK_STATUS_PASSING.equals(healthCheck.getStatus())) {
                 return false;
             }
         }

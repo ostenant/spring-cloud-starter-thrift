@@ -2,15 +2,17 @@ package com.icekredit.rpc.thrift.client.scanner;
 
 
 import com.icekredit.rpc.thrift.client.common.ThriftClientContext;
-import com.icekredit.rpc.thrift.client.common.ThriftServerNode;
 import com.icekredit.rpc.thrift.client.common.ThriftServiceSignature;
-import com.icekredit.rpc.thrift.client.exception.ThriftApplicationException;
-import com.icekredit.rpc.thrift.client.exception.ThriftClientException;
-import com.icekredit.rpc.thrift.client.exception.ThriftClientOpenException;
-import com.icekredit.rpc.thrift.client.exception.ThriftClientRequestTimeoutException;
+import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNode;
+import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNodeList;
+import com.icekredit.rpc.thrift.client.exception.*;
+import com.icekredit.rpc.thrift.client.loadbalancer.IRule;
+import com.icekredit.rpc.thrift.client.loadbalancer.RoundRobinRule;
+import com.icekredit.rpc.thrift.client.loadbalancer.ThriftConsulServerListLoadBalancer;
 import com.icekredit.rpc.thrift.client.pool.TransportKeyedObjectPool;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientPoolProperties;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientProperties;
+import com.orbitz.consul.Consul;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.thrift.TApplicationException;
@@ -30,6 +32,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Objects;
 
 public class ThriftClientAdvice implements MethodInterceptor {
 
@@ -39,29 +42,55 @@ public class ThriftClientAdvice implements MethodInterceptor {
 
     private Constructor<? extends TServiceClient> clientConstructor;
 
+    private ThriftConsulServerListLoadBalancer loadBalancer;
+
     private ThriftClientProperties properties;
 
     private TransportKeyedObjectPool objectPool;
-
 
     public ThriftClientAdvice(ThriftServiceSignature serviceSignature,
                               Constructor<? extends TServiceClient> clientConstructor) {
         this.serviceSignature = serviceSignature;
         this.clientConstructor = clientConstructor;
-        this.properties = ThriftClientContext.getContext().getProperties();
-        this.objectPool = ThriftClientContext.getContext().getObjectPool();
+
+        String consulAddress = ThriftClientContext.context().getRegistryAddress();
+        Consul consul;
+        try {
+            consul = Consul.builder()
+                    .withUrl(String.format("http://%s", consulAddress))
+                    .build();
+        } catch (Exception e) {
+            throw new ThriftClientRegistryException("Unable to access consul server, address is: " + consulAddress, e);
+        }
+
+        if (Objects.isNull(consul)) {
+            throw new ThriftClientRegistryException("Unable to access consul server, address is: " + consulAddress);
+        }
+
+        ThriftConsulServerNodeList serverNodeList = ThriftConsulServerNodeList.singleton(consul);
+
+        IRule routerRule = new RoundRobinRule();
+        this.loadBalancer = new ThriftConsulServerListLoadBalancer(serverNodeList, routerRule);
+        routerRule.setLoadBalancer(loadBalancer);
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
+        if (Objects.isNull(properties)) {
+            this.properties = ThriftClientContext.context().getProperties();
+        }
+
+        if (Objects.isNull(objectPool)) {
+            this.objectPool = ThriftClientContext.context().getObjectPool();
+        }
+
         ThriftClientPoolProperties poolProperties = properties.getPool();
 
-        ThriftServerNode node = new ThriftServerNode("localhost", 25000);
-
+        String serviceId = serviceSignature.getThriftServiceId();
+        ThriftConsulServerNode serverNode = loadBalancer.chooseServerNode(serviceId);
         String signature = serviceSignature.marker();
 
         Object[] args = invocation.getArguments();
-
         int retryTimes = 0;
 
         while (true) {
@@ -69,12 +98,12 @@ public class ThriftClientAdvice implements MethodInterceptor {
                 log.error(
                         "All thrift client call failed, method is {}, args is {}, retryTimes: {}",
                         invocation.getMethod().getName(), args, retryTimes);
-                throw new ThriftClientException("Thrift client call failed, thrift client signature is " + serviceSignature);
+                throw new ThriftClientException("Thrift client call failed, thrift client signature is: " + serviceSignature.marker());
             }
 
             TTransport transport = null;
             try {
-                transport = objectPool.borrowObject(node);
+                transport = objectPool.borrowObject(serverNode);
                 TProtocol protocol = new TBinaryProtocol(transport);
                 TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol,
                         signature);
@@ -100,19 +129,19 @@ public class ThriftClientAdvice implements MethodInterceptor {
                         }
 
                         log.error("Thrift client request timeout, ip is {}, port is {}, timeout is {}, method is {}, args is {}",
-                                node.getHost(), node.getPort(), node.getTimeout(),
+                                serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout(),
                                 invocation.getMethod(), args);
                         throw new ThriftClientRequestTimeoutException("Thrift client request timeout", e);
 
                     } else if (realException == null && innerException.getType() == TTransportException.END_OF_FILE) {
                         // 服务端直接抛出了异常 or 服务端在被调用的过程中被关闭了
-                        objectPool.clear(node); // 把以前的对象池进行销毁
+                        objectPool.clear(serverNode); // 把以前的对象池进行销毁
                         if (transport != null) {
                             transport.close();
                         }
 
                     } else if (realException instanceof SocketException) {
-                        objectPool.clear(node);
+                        objectPool.clear(serverNode);
                         if (transport != null) {
                             transport.close();
                         }
@@ -121,7 +150,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
                 } else if (undeclaredThrowable instanceof TApplicationException) {  // 有可能服务端返回的结果里存在null
                     log.error(
                             "Thrift end of file, ip is {}, port is {}, timeout is {}, method is {}, args is {}",
-                            node.getHost(), node.getPort(), node.getTimeout(),
+                            serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout(),
                             invocation.getMethod(), args);
                     throw new ThriftApplicationException("Thrift end of file", e);
 
@@ -142,7 +171,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
             } finally {
                 try {
                     if (objectPool != null && transport != null) {
-                        objectPool.returnObject(node, transport);
+                        objectPool.returnObject(serverNode, transport);
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);

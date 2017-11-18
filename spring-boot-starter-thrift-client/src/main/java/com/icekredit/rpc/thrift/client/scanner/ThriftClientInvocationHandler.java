@@ -21,9 +21,9 @@ public class ThriftClientInvocationHandler implements InvocationHandler {
 
     private ProxyFactory proxyFactory;
 
-    ThriftClientInvocationHandler(ThriftServiceSignature serviceSignature,
-                                  Class<?> clientClass,
-                                  Constructor<? extends TServiceClient> clientConstructor) throws Exception {
+    public ThriftClientInvocationHandler(ThriftServiceSignature serviceSignature,
+                                         Class<?> clientClass,
+                                         Constructor<? extends TServiceClient> clientConstructor) throws Exception {
         this.serviceSignature = serviceSignature;
         this.clientClass = clientClass;
         this.clientConstructor = clientConstructor;

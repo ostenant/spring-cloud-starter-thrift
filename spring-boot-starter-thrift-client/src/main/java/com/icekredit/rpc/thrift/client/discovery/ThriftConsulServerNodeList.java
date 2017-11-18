@@ -1,5 +1,6 @@
 package com.icekredit.rpc.thrift.client.discovery;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -16,6 +17,8 @@ import com.orbitz.consul.model.health.ServiceHealth;
 import com.orbitz.consul.option.QueryOptions;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,13 +26,15 @@ import java.util.Map;
 
 public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsulServerNode> {
 
+    private Logger log = LoggerFactory.getLogger(getClass());
+
     private final Consul consul;
     private final HealthClient healthClient;
     private final CatalogClient catalogClient;
 
     private static ThriftConsulServerNodeList serverNodeList = null;
 
-    private ThriftConsulServerNodeList singleton(Consul consul) {
+    public static ThriftConsulServerNodeList singleton(Consul consul) {
         if (serverNodeList == null) {
             synchronized (ThriftConsulServerNodeList.class) {
                 if (serverNodeList == null) {
@@ -64,10 +69,24 @@ public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsu
         List<ServiceHealth> serviceHealthList = healthClient.getAllServiceInstances(serviceName).getResponse();
 
         for (ServiceHealth serviceHealth : serviceHealthList) {
-            serverNodeList.add(getThriftConsulServerNode(serviceHealth));
+            ThriftConsulServerNode serverNode = getThriftConsulServerNode(serviceHealth);
+            if (serverNode == null) {
+                continue;
+            }
+
+            if (!serverNode.isHealth()) {
+                continue;
+            }
+
+            if (CollectionUtils.isEmpty(serverNode.getTags())) {
+                continue;
+            }
+            serverNodeList.add(serverNode);
         }
 
-        this.serverNodeMap.put(serviceName, Sets.newLinkedHashSet(serverNodeList));
+        if (CollectionUtils.isNotEmpty(serverNodeList)) {
+            this.serverNodeMap.put(serviceName, Sets.newLinkedHashSet(serverNodeList));
+        }
         return serverNodeList;
     }
 
@@ -99,16 +118,29 @@ public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsu
             List<ServiceHealth> serviceHealthList = healthClient.getAllServiceInstances(serviceName).getResponse();
             LinkedHashSet<ThriftConsulServerNode> serverNodeSet = Sets.newLinkedHashSet();
             for (ServiceHealth serviceHealth : serviceHealthList) {
-                serverNodeSet.add(getThriftConsulServerNode(serviceHealth));
+                ThriftConsulServerNode serverNode = getThriftConsulServerNode(serviceHealth);
+                if (serverNode == null) {
+                    continue;
+                }
+
+                if (!serverNode.isHealth()) {
+                    continue;
+                }
+
+                if (CollectionUtils.isEmpty(serverNode.getTags())) {
+                    continue;
+                }
+                serverNodeSet.add(serverNode);
             }
 
-            serverNodeMap.put(serviceName, serverNodeSet);
+            if (CollectionUtils.isNotEmpty(serverNodeSet)) {
+                serverNodeMap.put(serviceName, serverNodeSet);
+            }
         }
 
         this.serverNodeMap.clear();
         this.serverNodeMap.putAll(serverNodeMap);
-
-        return serverNodeMap;
+        return ImmutableMap.copyOf(this.serverNodeMap);
     }
 
 
@@ -134,7 +166,7 @@ public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsu
 
         List<ThriftConsulServerNode> serverNodeList;
 
-        ThriftConsulResponseCallback(List<ThriftConsulServerNode> serverNodeList) {
+        public ThriftConsulResponseCallback(List<ThriftConsulServerNode> serverNodeList) {
             this.serverNodeList = serverNodeList;
         }
 

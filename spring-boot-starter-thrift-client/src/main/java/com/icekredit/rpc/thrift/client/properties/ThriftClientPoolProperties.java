@@ -7,13 +7,15 @@ public class ThriftClientPoolProperties {
 
     private int retryTimes = 3;
 
+    private int connectTimeout = 10000;
+
     private int poolMaxTotalPerKey = 200;
 
     private int poolMaxIdlePerKey = 40;
 
     private int poolMinIdlePerKey = 10;
 
-    private long poolMaxWait = 1000;
+    private long poolMaxWait = 10;
 
     /**
      * 池对象创建时时验证是否正常可用
@@ -37,6 +39,14 @@ public class ThriftClientPoolProperties {
 
     public void setRetryTimes(int retryTimes) {
         this.retryTimes = retryTimes;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
     }
 
     public int getPoolMaxTotalPerKey() {

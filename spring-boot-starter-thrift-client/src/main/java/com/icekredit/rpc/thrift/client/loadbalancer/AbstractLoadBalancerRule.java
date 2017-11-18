@@ -2,7 +2,7 @@ package com.icekredit.rpc.thrift.client.loadbalancer;
 
 public abstract class AbstractLoadBalancerRule implements IRule {
 
-    private ILoadBalancer lb;
+    protected ILoadBalancer lb;
 
     @Override
     public void setLoadBalancer(ILoadBalancer lb) {

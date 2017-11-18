@@ -1,5 +1,6 @@
 package com.icekredit.rpc.thrift.client.loadbalancer;
 
+import com.google.common.collect.Lists;
 import com.icekredit.rpc.thrift.client.common.ThriftServerNode;
 import com.icekredit.rpc.thrift.client.discovery.ServerListUpdater;
 import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerListUpdater;
@@ -7,6 +8,10 @@ import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNode;
 import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNodeList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 
 public class ThriftConsulServerListLoadBalancer extends AbstractLoadBalancer {
 
@@ -68,7 +73,21 @@ public class ThriftConsulServerListLoadBalancer extends AbstractLoadBalancer {
     }
 
     private void updateListOfServers() {
-        this.serverNodeList.refreshThriftServers();
+        Map<String, LinkedHashSet<ThriftConsulServerNode>> thriftConsulServers = this.serverNodeList.refreshThriftServers();
+
+        List<String> serverList = Lists.newArrayList();
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, LinkedHashSet<ThriftConsulServerNode>> serverEntry : thriftConsulServers.entrySet()) {
+            serverList.add(
+                    sb.append(serverEntry.getKey())
+                            .append(": ")
+                            .append(serverEntry.getValue())
+                            .toString()
+            );
+            sb.setLength(0);
+        }
+
+        log.info("Refreshed thrift serverList: [" + String.join(", ", serverList) + "]");
     }
 
     @Override

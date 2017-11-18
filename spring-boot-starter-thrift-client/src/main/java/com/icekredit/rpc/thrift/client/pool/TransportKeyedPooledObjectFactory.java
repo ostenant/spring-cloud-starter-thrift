@@ -4,6 +4,7 @@ import com.icekredit.rpc.thrift.client.common.ThriftServerNode;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientConfigException;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientOpenException;
 import com.icekredit.rpc.thrift.client.factory.ThriftTransportFactory;
+import com.icekredit.rpc.thrift.client.properties.ThriftClientPoolProperties;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
@@ -37,7 +38,20 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
             throw new ThriftClientConfigException("Invalid Thrift server, node port: " + key.getPort());
         }
 
-        TTransport transport = ThriftTransportFactory.determineTTranport(properties.getServiceModel(), key);
+        TTransport transport;
+
+        ThriftClientPoolProperties poolProperties = properties.getPool();
+        if (Objects.isNull(poolProperties)) {
+            transport = ThriftTransportFactory.determineTTranport(properties.getServiceModel(), key);
+
+        } else {
+            int connectTimeout = poolProperties.getConnectTimeout();
+            if (connectTimeout > 0) {
+                transport = ThriftTransportFactory.determineTTranport(properties.getServiceModel(), key, connectTimeout);
+            } else {
+                transport = ThriftTransportFactory.determineTTranport(properties.getServiceModel(), key);
+            }
+        }
 
         try {
             transport.open();
