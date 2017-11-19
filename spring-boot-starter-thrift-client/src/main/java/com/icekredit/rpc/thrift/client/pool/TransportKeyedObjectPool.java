@@ -15,4 +15,14 @@ public class TransportKeyedObjectPool extends GenericKeyedObjectPool<ThriftServe
     public TransportKeyedObjectPool(KeyedPooledObjectFactory factory, GenericKeyedObjectPoolConfig config) {
         super(factory, config);
     }
+
+    @Override
+    public TTransport borrowObject(ThriftServerNode key) throws Exception {
+        return super.borrowObject(key);
+    }
+
+    @Override
+    public void returnObject(ThriftServerNode key, TTransport obj) {
+        super.returnObject(key, obj);
+    }
 }
