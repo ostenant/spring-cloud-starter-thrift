@@ -25,7 +25,7 @@ spring:
         max-interval: 2000
   thrift:
     client:
-      package-to-scan: org.ostenant.springboot.learning.examples.rpc
+      package-to-scan: com.icekredit.rpc.thrift.example.rpc
       service-model: hsHa
       pool:
         retry-times: 3

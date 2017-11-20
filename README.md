@@ -1,10 +1,10 @@
-# spring-boot-starter-thrift
+# spring-cloud-starter-thrift
 
 ## 简介
 
-`spring-boot-starter-thrift`提供`SpringBoot`对可伸缩的跨语言服务调用框架`Apache Thrift`的封装和集成。
+`spring-cloud-starter-thrift`提供`Spring Cloud`对可伸缩的跨语言服务调用框架`Apache Thrift`的封装和集成。
 
-`spring-boot-starter-thrift`包括客户端`spring-boot-starter-thrift-client`和服务端`spring-boot-starter-thrift-server`两个模块。
+`spring-cloud-starter-thrift`包括客户端`spring-cloud-starter-thrift-client`和服务端`spring-cloud-starter-thrift-server`两个模块。
 
 **服务端：**
   1. 支持`Apache Thrift`的各种原生服务线程模型，包括单线程阻塞模型(`simple`)、单线程非阻塞模型(`nonBlocking`)、线程池阻塞模型(`threadPool`)、半同步半异步模型(`hsHa`)和半同步半异步线程选择器模型(`threadedSelector`)。
@@ -21,14 +21,14 @@
 
 ## 快速开始
 
-`spring-boot-starter-thrift`使用的是`0.10.0`版本的`thrift`。
+`spring-cloud-starter-thrift`使用的是`0.10.0`版本的`thrift`。
 
 首先，通过`Apache Thrift`的`IDL`(接口描述语言)编写客户端桩`Stub`和服务端骨架`Skeleton`，通过`.thrift`文件定义接口规范。
 
 calculator.thrift
 
 ```thrift
-namespace java org.ostenant.springboot.learning.examples
+namespace java com.icekredit.rpc.thrift.example
 
 service CalculatorService {
     i32 add(1: i32 arg1, 2: i32 arg2)
@@ -129,12 +129,12 @@ public class CalculatorService {
 
 ### 服务端程序：
 
-在`pom.xml`文件中引入服务端依赖`spring-boot-starter-thrift-server`：
+在`pom.xml`文件中引入服务端依赖`spring-cloud-starter-thrift-server`：
 
 ```xml
     <dependency>
         <groupId>com.icekredit.rpc.thrift</groupId>
-        <artifactId>spring-boot-starter-thrift-server</artifactId>
+        <artifactId>spring-cloud-starter-thrift-server</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
 ```
@@ -143,61 +143,51 @@ pom.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-  <project xmlns="http://maven.apache.org/POM/4.0.0"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-      <parent>
-          <artifactId>spring-boot-thrift</artifactId>
-          <groupId>org.ostenant.springboot.learning.examples</groupId>
-          <version>0.0.1-SNAPSHOT</version>
-      </parent>
-      <modelVersion>4.0.0</modelVersion>
-  
-      <artifactId>spring-boot-thrift-server</artifactId>
-      <packaging>jar</packaging>
-  
-      <dependencies>
-          <dependency>
-              <groupId>org.ostenant.springboot.learning.examples</groupId>
-              <artifactId>spring-boot-thrift-iface</artifactId>
-              <version>0.0.1-SNAPSHOT</version>
-          </dependency>
-          <dependency>
-              <groupId>com.icekredit.rpc.thrift</groupId>
-              <artifactId>spring-boot-starter-thrift-server</artifactId>
-              <version>1.0-SNAPSHOT</version>
-          </dependency>
-          <dependency>
-              <groupId>org.springframework.boot</groupId>
-              <artifactId>spring-boot-starter-actuator</artifactId>
-          </dependency>
-          <dependency>
-              <groupId>org.springframework.boot</groupId>
-              <artifactId>spring-boot-starter-web</artifactId>
-          </dependency>
-      </dependencies>
-  
-      <dependencyManagement>
-          <dependencies>
-              <dependency>
-                  <groupId>org.springframework.cloud</groupId>
-                  <artifactId>spring-cloud-dependencies</artifactId>
-                  <version>${spring-cloud.version}</version>
-                  <type>pom</type>
-                  <scope>import</scope>
-              </dependency>
-          </dependencies>
-      </dependencyManagement>
-  
-      <build>
-          <plugins>
-              <plugin>
-                  <groupId>org.springframework.boot</groupId>
-                  <artifactId>spring-boot-maven-plugin</artifactId>
-              </plugin>
-          </plugins>
-      </build>
-  </project>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.icekredit.rpc.thrift</groupId>
+        <artifactId>spring-cloud-starter-thrift-example</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-cloud-starter-thrift-example-server</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.icekredit.rpc.thrift</groupId>
+            <artifactId>spring-boot-starter-thrift-server</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.icekredit.rpc.thrift</groupId>
+            <artifactId>spring-cloud-starter-thrift-example-iface</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
 
 ```
 
@@ -353,12 +343,12 @@ docker run -d -p 8081:8080 -p 25003:25000 --name calculator-server-01 \
 
 ### 客户端程序：
 
-在`pom.xml`文件中引入客户端依赖`spring-boot-starter-thrift-client`：
+在`pom.xml`文件中引入客户端依赖`spring-cloud-starter-thrift-client`：
 
 ```xml
     <dependency>
         <groupId>com.icekredit.rpc.thrift</groupId>
-        <artifactId>spring-boot-starter-thrift-client</artifactId>
+        <artifactId>spring-cloud-starter-thrift-client</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
 ```
@@ -371,37 +361,38 @@ pom.xml
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>spring-boot-thrift</artifactId>
-        <groupId>org.ostenant.springboot.learning.examples</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>com.icekredit.rpc.thrift</groupId>
+        <artifactId>spring-cloud-starter-thrift-example</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spring-boot-thrift-server</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>spring-boot-starter-thrift-example-client</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.ostenant.springboot.learning.examples</groupId>
-            <artifactId>spring-boot-thrift-iface</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>com.icekredit.rpc.thrift</groupId>
+            <artifactId>spring-cloud-starter-thrift-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.icekredit.rpc.thrift</groupId>
-            <artifactId>spring-boot-starter-thrift-server</artifactId>
+            <artifactId>spring-cloud-starter-thrift-example-iface</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
         </dependency>
     </dependencies>
 
@@ -425,6 +416,7 @@ pom.xml
             </plugin>
         </plugins>
     </build>
+
 </project>
 
 ```
@@ -460,7 +452,7 @@ spring:
         max-interval: 2000
   thrift:
     client:
-      package-to-scan: org.ostenant.springboot.learning.examples.rpc ## 标记由有注解@ThriftClient接口的包路径
+      package-to-scan: com.icekredit.rpc.thrift.example.rpc ## 标记由有注解@ThriftClient接口的包路径
       service-model: hsHa ## 服务线程模型（这里必须与服务端保持一致, 默认都是hsHa）
       pool: ## 客户端连接池配置
         retry-times: 3 

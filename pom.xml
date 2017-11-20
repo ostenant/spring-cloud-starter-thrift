@@ -4,17 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.icekredit.rpc.thrift</groupId>
-    <artifactId>spring-boot-starter-thrift</artifactId>
+    <artifactId>spring-cloud-starter-thrift</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>spring-boot-starter-thrift-server</module>
-        <module>spring-boot-starter-thrift-client</module>
-        <module>spring-boot-starter-thrift-example</module>
+        <module>spring-cloud-starter-thrift-server</module>
+        <module>spring-cloud-starter-thrift-client</module>
+        <module>spring-cloud-starter-thrift-example</module>
     </modules>
 
-    <name>spring-boot-starter-thrift</name>
-    <description>SpringBoot Thrift Starter</description>
+    <name>spring-cloud-starter-thrift</name>
+    <description>SpringCloud Thrift Starter</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
