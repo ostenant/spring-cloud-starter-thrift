@@ -569,3 +569,15 @@ public class RpcCalculatorController {
 2017-11-20 11:03:56.778  INFO 4052 --- [erListUpdater-0] t.c.l.ThriftConsulServerListLoadBalancer : Refreshed thrift serverList: [thrift-rpc-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25001], host='192.168.91.128', port=25001, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25002], host='192.168.91.128', port=25002, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25003], host='192.168.91.128', port=25003, address='192.168.91.128', isHealth=true}], consul-8301: [ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=8301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=9301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=10301, address='192.168.91.128', isHealth=true}], consul-8302: [ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=8302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=9302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=10302, address='192.168.91.128', isHealth=true}], thrift-rest-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8081], host='192.168.91.128', port=8081, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8082], host='192.168.91.128', port=8082, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8083], host='192.168.91.128', port=8083, address='192.168.91.128', isHealth=true}]]
 
 ```
+
+### 本地测试：
+
+访问本地`Thrift`客户端：
+
+| 访问地址       | 参数arg1  | 参数arg2  | 页面输出结果  |
+| :------------- |:-------------:|:-------------:|:-------------:|
+| /rpc/add  | 200 | 100 | 300 | 
+| /rpc/subtract  | 200 | 100 | 100 | 
+| /rpc/multiply  | 200 | 100 | 20000 | 
+| /rpc/division  | 200 | 100 | 2 | 
+
