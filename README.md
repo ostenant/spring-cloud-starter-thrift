@@ -132,11 +132,11 @@ public class CalculatorService {
 在`pom.xml`文件中引入服务端依赖`spring-boot-starter-thrift-server`：
 
 ```xml
-  <dependency>
-      <groupId>com.icekredit.rpc.thrift</groupId>
-      <artifactId>spring-boot-starter-thrift-server</artifactId>
-      <version>1.0-SNAPSHOT</version>
-  </dependency>
+    <dependency>
+        <groupId>com.icekredit.rpc.thrift</groupId>
+        <artifactId>spring-boot-starter-thrift-server</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
 ```
 
 pom.xml
@@ -172,10 +172,6 @@ pom.xml
               <artifactId>spring-boot-starter-actuator</artifactId>
           </dependency>
           <dependency>
-              <groupId>org.springframework.cloud</groupId>
-              <artifactId>spring-cloud-starter-consul-discovery</artifactId>
-          </dependency>
-          <dependency>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-starter-web</artifactId>
           </dependency>
@@ -205,7 +201,6 @@ pom.xml
 
 ```
 
-
 application.yml
 
 ```yaml
@@ -222,7 +217,7 @@ management:
   security:
     enabled: false
 
-## 
+## Spring Thrift服务端配置
 spring:
   thrift:
     server:
@@ -358,3 +353,219 @@ docker run -d -p 8081:8080 -p 25003:25000 --name calculator-server-01 \
 
 ### 客户端程序：
 
+在`pom.xml`文件中引入客户端依赖`spring-boot-starter-thrift-client`：
+
+```xml
+    <dependency>
+        <groupId>com.icekredit.rpc.thrift</groupId>
+        <artifactId>spring-boot-starter-thrift-client</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+```
+
+pom.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>spring-boot-thrift</artifactId>
+        <groupId>org.ostenant.springboot.learning.examples</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-boot-thrift-server</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ostenant.springboot.learning.examples</groupId>
+            <artifactId>spring-boot-thrift-iface</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.icekredit.rpc.thrift</groupId>
+            <artifactId>spring-boot-starter-thrift-server</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+```
+
+application.yml
+
+```yaml
+## 客户端的HTTP端口号
+server:
+  port: 8080
+
+## 用于Consul健康检查
+endpoints:
+  actuator:
+    sensitive: false
+    enabled: true
+management:
+  security:
+    enabled: false
+
+## Spring Thrift客户端配置(Thrift Client的自动配置取决于Spring Cloud Consul的正确配置)
+spring:
+  cloud:
+    consul:
+      host: 192.168.91.128 ## Consul的IP地址
+      port: 8500 ## Consul的端口号
+      discovery:
+        register: false ## 是否将自身注册为服务
+        register-health-check: true 
+        health-check-interval: 30s ## HTTP服务健康检查时间间隔
+      retry:
+        max-attempts: 3
+        max-interval: 2000
+  thrift:
+    client:
+      package-to-scan: org.ostenant.springboot.learning.examples.rpc ## 标记由有注解@ThriftClient接口的包路径
+      service-model: hsHa ## 服务线程模型（这里必须与服务端保持一致, 默认都是hsHa）
+      pool: ## 客户端连接池配置
+        retry-times: 3 
+        pool-max-total-per-key: 200
+        pool-min-idle-per-key: 10
+        pool-max-idle-per-key: 40
+        pool-max-wait: 1000
+        connect-timeout: 2000
+
+```
+
+Application.java
+
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+
+```
+
+编写`Thrift Client`的客户端代理接口，这里有两点注意事项：
+  1. 接口需要继承于父接口`ThriftClientAware`，且`ThriftClientAware`里的泛型参数填写为`Thrift IDL`生成的`Stub`类`CalculatorService`中的`Client`内部类。
+  > 接口中有一个抽象方法T thriftClient()可以获取具体的`Thrift Client`的代理对象。
+  
+  2. 接口标识注解@ThriftClient：
+  > (a). serviceId：此客户端代理接口绑定的`Thrift`服务端的服务注册ID(与服务端保持一致)。
+  > (b). refer：`Thrift`服务端具体的`Stub`生成类。
+  > (c). version: `Stub`生成类具体业务实现类的版本号(不填写默认为1.0)，需要与服务端保持一致。
+  
+  
+```java
+@ThriftClient(serviceId = "thrift-rpc-calculator", refer = CalculatorService.class, version = 2.0)
+public interface CalculatorThriftClient extends ThriftClientAware<CalculatorService.Client> {
+}
+
+```
+
+在`Controller`中注入ThriftClientAware<? extend TServiceClient>子接口，使用注解@ThriftReferer标识即可成功注入。
+使用时，通过XxxxThriftClient.thriftClient()即可调用远程`Thrift Server`的服务方法。
+
+
+RpcCalculatorController.java
+
+```java 
+@RestController
+@RequestMapping("/rpc")
+public class RpcCalculatorController {
+
+    @ThriftReferer
+    CalculatorThriftClient calculators;
+
+    @GetMapping("/add")
+    public int add(@RequestParam("arg1") int arg1, @RequestParam("arg2") int arg2) throws Exception {
+        return calculators.thriftClient().add(arg1, arg2);
+    }
+
+    @GetMapping("/subtract")
+    public int subtract(@RequestParam("arg1") int arg1, @RequestParam("arg2") int arg2) throws Exception {
+        return calculators.thriftClient().subtract(arg1, arg2);
+
+    }
+
+    @GetMapping("/multiply")
+    public int multiply(@RequestParam("arg1") int arg1, @RequestParam("arg2") int arg2) throws Exception {
+        return calculators.thriftClient().multiply(arg1, arg2);
+    }
+
+    @GetMapping("/division")
+    public int division(@RequestParam("arg1") int arg1, @RequestParam("arg2") int arg2) throws Exception {
+        return calculators.thriftClient().division(arg1, arg2);
+    }
+
+}
+
+```
+在本地`8080`端口号启动`Thrift`客户端，正常启动后观察启动日志如下：
+
+```bash
+2017-11-20 11:00:20.025  INFO 4052 --- [           main] .r.t.c.ThriftClientBeanScannerConfigurer : Base package org.ostenant.springboot.learning.examples.rpc is to be scanned with com.icekredit.rpc.thrift.client.scanner.ThriftClientBeanScanner@37496720
+2017-11-20 11:00:20.029  INFO 4052 --- [           main] c.i.r.t.c.s.ThriftClientBeanScanner      : Packages scanned by thriftClientBeanDefinitionScanner is [org.ostenant.springboot.learning.examples.rpc]
+2017-11-20 11:00:20.029  INFO 4052 --- [           main] c.i.r.t.c.s.ThriftClientBeanScanner      : Scanned and found thrift client, bean calculatorThriftClient assigned from org.ostenant.springboot.learning.examples.rpc.CalculatorThriftClient
+2017-11-20 11:00:20.050  INFO 4052 --- [           main] f.a.AutowiredAnnotationBeanPostProcessor : JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+2017-11-20 11:00:20.134  INFO 4052 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.ostenant.springboot.learning.examples.rest.CalculatorFeignClient' of type [org.springframework.cloud.netflix.feign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-11-20 11:00:20.136  WARN 4052 --- [           main] c.i.r.t.c.s.ThriftClientFactoryBean      : Bean class is not found
+2017-11-20 11:00:20.142  INFO 4052 --- [           main] c.i.r.t.c.s.ThriftClientFactoryBean      : Succeed to instantiate an instance of ThriftClientFactoryBean: com.icekredit.rpc.thrift.client.scanner.ThriftClientFactoryBean@7bac686b
+2017-11-20 11:00:20.142  INFO 4052 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'calculatorThriftClient' of type [com.icekredit.rpc.thrift.client.scanner.ThriftClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-11-20 11:00:20.411  INFO 4052 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.netflix.metrics.MetricsInterceptorConfiguration$MetricsRestTemplateConfiguration' of type [org.springframework.cloud.netflix.metrics.MetricsInterceptorConfiguration$MetricsRestTemplateConfiguration$$EnhancerBySpringCGLIB$$a9ef18dc] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-11-20 11:00:20.423  INFO 4052 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration' of type [org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration$$EnhancerBySpringCGLIB$$93dc7598] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-11-20 11:00:21.592  INFO 4052 --- [           main] s.b.c.e.t.TomcatEmbeddedServletContainer : Tomcat initialized with port(s): 8080 (http)
+```
+
+启动过程中，所有的标记有注解@ThriftClient的接口都生成了代理对象，并通过注解@ThriftReferer注入到Controller中。
+
+同时，`客户端`启动时开启了一个`ServerUpdater`，定时动态的去`Consul`服务注册列表抓取健康的服务信息，缓存到本地服务列表中。
+
+```bash
+2017-11-20 11:02:26.726  INFO 4052 --- [erListUpdater-0] t.c.l.ThriftConsulServerListLoadBalancer : Refreshed thrift serverList: [thrift-rpc-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25001], host='192.168.91.128', port=25001, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25002], host='192.168.91.128', port=25002, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25003], host='192.168.91.128', port=25003, address='192.168.91.128', isHealth=true}], consul-8301: [ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=8301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=9301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=10301, address='192.168.91.128', isHealth=true}], consul-8302: [ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=8302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=9302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=10302, address='192.168.91.128', isHealth=true}], thrift-rest-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8081], host='192.168.91.128', port=8081, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8082], host='192.168.91.128', port=8082, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8083], host='192.168.91.128', port=8083, address='192.168.91.128', isHealth=true}]]
+2017-11-20 11:02:56.752  INFO 4052 --- [erListUpdater-0] t.c.l.ThriftConsulServerListLoadBalancer : Refreshed thrift serverList: [thrift-rpc-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25001], host='192.168.91.128', port=25001, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25002], host='192.168.91.128', port=25002, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25003], host='192.168.91.128', port=25003, address='192.168.91.128', isHealth=true}], consul-8301: [ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=8301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=9301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=10301, address='192.168.91.128', isHealth=true}], consul-8302: [ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=8302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=9302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=10302, address='192.168.91.128', isHealth=true}], thrift-rest-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8081], host='192.168.91.128', port=8081, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8082], host='192.168.91.128', port=8082, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8083], host='192.168.91.128', port=8083, address='192.168.91.128', isHealth=true}]]
+2017-11-20 11:03:26.764  INFO 4052 --- [erListUpdater-0] t.c.l.ThriftConsulServerListLoadBalancer : Refreshed thrift serverList: [thrift-rpc-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25001], host='192.168.91.128', port=25001, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25002], host='192.168.91.128', port=25002, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25003], host='192.168.91.128', port=25003, address='192.168.91.128', isHealth=true}], consul-8301: [ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=8301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=9301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=10301, address='192.168.91.128', isHealth=true}], consul-8302: [ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=8302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=9302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=10302, address='192.168.91.128', isHealth=true}], thrift-rest-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8081], host='192.168.91.128', port=8081, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8082], host='192.168.91.128', port=8082, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8083], host='192.168.91.128', port=8083, address='192.168.91.128', isHealth=true}]]
+2017-11-20 11:03:56.778  INFO 4052 --- [erListUpdater-0] t.c.l.ThriftConsulServerListLoadBalancer : Refreshed thrift serverList: [thrift-rpc-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25001], host='192.168.91.128', port=25001, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25002], host='192.168.91.128', port=25002, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rpc-calculator', tags=[thrift-rpc-calculator-25003], host='192.168.91.128', port=25003, address='192.168.91.128', isHealth=true}], consul-8301: [ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=8301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=9301, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8301', tags=[udp], host='192.168.91.128', port=10301, address='192.168.91.128', isHealth=true}], consul-8302: [ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=8302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=9302, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='consul-8302', tags=[udp], host='192.168.91.128', port=10302, address='192.168.91.128', isHealth=true}], thrift-rest-calculator: [ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8081], host='192.168.91.128', port=8081, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8082], host='192.168.91.128', port=8082, address='192.168.91.128', isHealth=true}, ThriftServerNode{node='node1', serviceId='thrift-rest-calculator', tags=[thrift-rest-calculator-8083], host='192.168.91.128', port=8083, address='192.168.91.128', isHealth=true}]]
+
+```
