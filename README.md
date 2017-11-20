@@ -367,7 +367,7 @@ pom.xml
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spring-boot-starter-thrift-example-client</artifactId>
+    <artifactId>spring-cloud-starter-thrift-example-client</artifactId>
 
     <dependencies>
         <dependency>
