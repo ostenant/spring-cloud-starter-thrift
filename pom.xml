@@ -10,7 +10,6 @@
     <modules>
         <module>spring-cloud-starter-thrift-server</module>
         <module>spring-cloud-starter-thrift-client</module>
-        <module>spring-cloud-starter-thrift-example</module>
     </modules>
 
     <name>spring-cloud-starter-thrift</name>
