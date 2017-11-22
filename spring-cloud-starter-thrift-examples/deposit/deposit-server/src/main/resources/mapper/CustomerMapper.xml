@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icekredit.rpc.thrift.examples.mapper.CustomerMapper">
+    <resultMap id="BaseResultMap" type="com.icekredit.rpc.thrift.examples.http.entities.Customer">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="birthday" jdbcType="VARCHAR" property="birthday"/>
+        <result column="sex" jdbcType="INTEGER" property="sex"/>
+        <result column="age" jdbcType="INTEGER" property="age"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id, name, birthday, sex, age, address
+    </sql>
+
+
+    <select id="findById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from customer
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM customer
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+
+    <insert id="save" parameterType="com.icekredit.rpc.thrift.examples.http.entities.Customer">
+        INSERT INTO customer (id, name, birthday,
+                              sex, age, address)
+        VALUES (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{birthday,jdbcType=VARCHAR},
+                #{sex,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR})
+    </insert>
+
+
+    <update id="update" parameterType="com.icekredit.rpc.thrift.examples.http.entities.Customer">
+        update customer
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from customer
+    </select>
+
+
+    <select id="findByIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from customer
+        where id in
+        <foreach close=")" collection="list" item="item" open="(" separator=",">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from
+        customer
+        where
+        id in
+        <foreach close=")" collection="list" item="item" open="(" separator=",">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+
+    <insert id="saveBatch" parameterType="java.util.List">
+        insert into
+        customer
+        (id, name, birthday, sex, age, address)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.birthday,jdbcType=VARCHAR},
+            #{item.sex,jdbcType=INTEGER}, #{item.age,jdbcType=INTEGER}, #{item.address,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+
+    <update id="updateBatch" parameterType="java.util.List">
+        update customer
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="name = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.name != null">
+                        when #{item.id,jdbcType=VARCHAR} then #{item.name,jdbcType=VARCHAR}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="birthday = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.birthday != null">
+                        when #{item.id,jdbcType=VARCHAR} then #{item.birthday,jdbcType=VARCHAR}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="sex = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.sex != null">
+                        when #{item.id,jdbcType=VARCHAR} then #{item.sex,jdbcType=INTEGER}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="age = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.age != null">
+                        when #{item.id,jdbcType=VARCHAR} then #{item.age,jdbcType=INTEGER}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="address = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.address != null">
+                        when #{item.id,jdbcType=VARCHAR} then #{item.address,jdbcType=VARCHAR}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach close=")" collection="list" item="item" open="(" separator=", ">
+            #{item.id,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+</mapper>

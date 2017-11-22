@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icekredit.rpc.thrift.examples.mapper.BranchMapper">
+    <resultMap id="BaseResultMap" type="com.icekredit.rpc.thrift.examples.http.entities.Branch">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="staffs" jdbcType="INTEGER" property="staffs"/>
+        <result column="bank_id" jdbcType="BIGINT" property="bankId"/>
+        <result column="region_id" jdbcType="INTEGER" property="regionId"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id, code, name, address, staffs, bank_id, region_id
+    </sql>
+
+
+    <select id="findById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from branch
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM branch
+        WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+
+    <insert id="save" keyColumn="id" keyProperty="id"
+            parameterType="com.icekredit.rpc.thrift.examples.http.entities.Branch"
+            useGeneratedKeys="true">
+        INSERT INTO branch (id, code, name,
+                            address, staffs, bank_id,
+                            region_id)
+        VALUES (#{id,jdbcType=BIGINT}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+                #{address,jdbcType=VARCHAR}, #{staffs,jdbcType=INTEGER}, #{bankId,jdbcType=BIGINT},
+                #{regionId,jdbcType=INTEGER})
+    </insert>
+
+
+    <update id="update" parameterType="com.icekredit.rpc.thrift.examples.http.entities.Branch">
+        update branch
+        <set>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="staffs != null">
+                staffs = #{staffs,jdbcType=INTEGER},
+            </if>
+            <if test="bankId != null">
+                bank_id = #{bankId,jdbcType=BIGINT},
+            </if>
+            <if test="regionId != null">
+                region_id = #{regionId,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from branch
+    </select>
+
+
+    <select id="findByIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from branch
+        where id in
+        <foreach close=")" collection="list" item="item" open="(" separator=",">
+            #{item,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+
+    <select id="queryAllBranchesByBankId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM branch
+        WHERE bank_id = #{bankId}
+    </select>
+
+
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from
+        branch
+        where
+        id in
+        <foreach close=")" collection="list" item="item" open="(" separator=",">
+            #{item,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+
+    <insert id="saveBatch" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into
+        branch
+        (id, code, name, address, staffs, bank_id, region_id)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id,jdbcType=BIGINT}, #{item.code,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
+            #{item.address,jdbcType=VARCHAR}, #{item.staffs,jdbcType=INTEGER}, #{item.bankId,jdbcType=BIGINT},
+            #{item.regionId,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+
+    <update id="updateBatch" parameterType="java.util.List">
+        update branch
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="code = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.code != null">
+                        when #{item.id,jdbcType=BIGINT} then #{item.code,jdbcType=VARCHAR}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="name = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.name != null">
+                        when #{item.id,jdbcType=BIGINT} then #{item.name,jdbcType=VARCHAR}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="address = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.address != null">
+                        when #{item.id,jdbcType=BIGINT} then #{item.address,jdbcType=VARCHAR}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="staffs = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.staffs != null">
+                        when #{item.id,jdbcType=BIGINT} then #{item.staffs,jdbcType=INTEGER}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="bank_id = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.bankId != null">
+                        when #{item.id,jdbcType=BIGINT} then #{item.bankId,jdbcType=BIGINT}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="region_id = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    <if test="item.regionId != null">
+                        when #{item.id,jdbcType=BIGINT} then #{item.regionId,jdbcType=INTEGER}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach close=")" collection="list" item="item" open="(" separator=", ">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+</mapper>
