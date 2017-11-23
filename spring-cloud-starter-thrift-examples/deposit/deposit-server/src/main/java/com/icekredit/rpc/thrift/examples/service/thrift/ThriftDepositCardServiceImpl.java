@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ThriftService(name = "thriftDepositCardServiceImpl")
+@ThriftService(name = "thriftDepositCardService")
 public class ThriftDepositCardServiceImpl implements ThriftDepositCardService.Iface {
 
     private final BranchMapper branchMapper;

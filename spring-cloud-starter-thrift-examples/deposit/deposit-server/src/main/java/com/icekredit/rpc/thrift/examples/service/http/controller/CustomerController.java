@@ -1,13 +1,16 @@
 package com.icekredit.rpc.thrift.examples.service.http.controller;
 
 import com.icekredit.rpc.thrift.examples.http.entities.Customer;
+import com.icekredit.rpc.thrift.examples.http.service.ICustomerController;
 import com.icekredit.rpc.thrift.examples.service.http.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/http/customer")
-public class CustomerController {
+public class CustomerController implements ICustomerController {
 
     private final CustomerService customerService;
 
@@ -19,6 +22,11 @@ public class CustomerController {
     @GetMapping("/getCustomerById")
     public Customer getCustomerById(@RequestParam("customerId") String customerId) {
         return customerService.getCustomerById(customerId);
+    }
+
+    @GetMapping("/queryAllCustomers")
+    public List<Customer> queryAllCustomers() {
+        return customerService.queryAllCustomers();
     }
 
     @PostMapping("/addNewCustomer")

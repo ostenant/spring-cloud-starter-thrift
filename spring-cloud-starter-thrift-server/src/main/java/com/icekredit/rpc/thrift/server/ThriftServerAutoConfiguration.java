@@ -4,6 +4,7 @@ import com.icekredit.rpc.thrift.server.annotation.ThriftService;
 import com.icekredit.rpc.thrift.server.context.AbstractThriftServerContext;
 import com.icekredit.rpc.thrift.server.context.ThriftServerContext;
 import com.icekredit.rpc.thrift.server.exception.ThriftServerException;
+import com.icekredit.rpc.thrift.server.exception.ThriftServerInstantiateException;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerPropertiesCondition;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
@@ -11,6 +12,8 @@ import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapperFactory;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.Advised;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -50,16 +53,29 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
             throw new ThriftServerException("Can not found any thrift service");
         }
 
-        List<ThriftServiceWrapper> serviceWrappers = Arrays.stream(beanNames)
-                .distinct().map(beanName -> {
+        List<ThriftServiceWrapper> serviceWrappers = Arrays.stream(beanNames).distinct().map(beanName -> {
             Object bean = applicationContext.getBean(beanName);
+            Object target = bean;
+
+            TargetSource targetSource = ((Advised) target).getTargetSource();
+            if (log.isDebugEnabled()) {
+                log.debug("Target object {} uses cglib proxy");
+            }
+
+            try {
+                target = targetSource.getTarget();
+            } catch (Exception e) {
+                throw new ThriftServerInstantiateException("Failed to get target bean from " + target, e);
+            }
+            final Object targetBean = target;
+
             ThriftService thriftService = bean.getClass().getAnnotation(ThriftService.class);
 
             String thriftServiceName = StringUtils.isEmpty(thriftService.value()) ? beanName : thriftService.value();
 
             return ThriftServiceWrapperFactory.wrapper(
                     properties.getServiceId(),
-                    thriftServiceName, bean,
+                    thriftServiceName, targetBean,
                     thriftService.version());
 
         }).collect(Collectors.toList());

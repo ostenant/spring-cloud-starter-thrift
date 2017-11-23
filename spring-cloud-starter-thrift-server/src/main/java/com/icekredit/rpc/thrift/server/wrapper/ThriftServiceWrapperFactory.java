@@ -15,16 +15,16 @@ public final class ThriftServiceWrapperFactory {
             thriftServiceWrapper = new ThriftServiceWrapper(thriftServiceName, thriftService.getClass(), thriftService, version);
         }
 
-        Class<?> thriftServiceIFace = Arrays.stream(thriftService.getClass().getInterfaces())
-                .filter(iFace -> iFace.getName().endsWith("$Iface"))
+        Class<?> thriftServiceIface = Arrays.stream(thriftService.getClass().getInterfaces())
+                .filter(iface -> iface.getName().endsWith("$Iface"))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No thrift IFace found on service"));
+                .orElseThrow(() -> new IllegalStateException("No thrift Iface found on service"));
 
         thriftServiceWrapper.setType(thriftService.getClass());
-        thriftServiceWrapper.setIfaceType(thriftServiceIFace);
+        thriftServiceWrapper.setIfaceType(thriftServiceIface);
 
         final String signature = String.join("$", new String[]{
-                thriftServiceId, thriftServiceIFace.getDeclaringClass().getName(),
+                thriftServiceId, thriftServiceIface.getDeclaringClass().getName(),
                 String.valueOf(version)
         });
 
@@ -45,15 +45,15 @@ public final class ThriftServiceWrapperFactory {
             thriftServiceWrapper = new ThriftServiceWrapper(thriftServiceName, thriftService.getClass(), thriftService, version);
         }
 
-        Class<?> thriftServiceIFace = Arrays.stream(type.getInterfaces())
-                .filter(iFace -> iFace.getName().endsWith("$Iface"))
+        Class<?> thriftServiceIface = Arrays.stream(type.getInterfaces())
+                .filter(iface -> iface.getName().endsWith("$Iface"))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No thrift IFace found on service"));
 
-        thriftServiceWrapper.setIfaceType(thriftServiceIFace);
+        thriftServiceWrapper.setIfaceType(thriftServiceIface);
 
         final String signature = String.join("$", new String[]{
-                thriftServiceId, thriftServiceIFace.getDeclaringClass().getName(),
+                thriftServiceId, thriftServiceIface.getDeclaringClass().getName(),
                 String.valueOf(version)
         });
 

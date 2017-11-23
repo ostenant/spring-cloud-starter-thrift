@@ -17,5 +17,4 @@ public interface CustomerService {
 
     Long getTotalDepositCards(String customerId);
 
-
 }

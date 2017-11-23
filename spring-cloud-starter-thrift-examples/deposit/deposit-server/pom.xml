@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.icekredit.rpc.thrift</groupId>
-            <artifactId>spring-boot-starter-thrift-server</artifactId>
+            <artifactId>spring-cloud-starter-thrift-server</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -38,7 +38,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
         </dependency>
 
         <dependency>

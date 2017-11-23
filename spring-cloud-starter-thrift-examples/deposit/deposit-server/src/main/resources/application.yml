@@ -10,6 +10,12 @@ management:
     enabled: false
 
 spring:
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/deposit?useUnicode=true&characterEncoding=utf-8
+      driver-class-name: com.mysql.jdbc.Driver
+      username: root
+      password: root
   thrift:
     server:
       service-id: deposit-thrift-service
@@ -20,3 +26,7 @@ spring:
         min-worker-threads: 5
         max-worker-threads: 20
         keep-alived-time: 3
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.icekredit.rpc.thrift.examples.http.entities

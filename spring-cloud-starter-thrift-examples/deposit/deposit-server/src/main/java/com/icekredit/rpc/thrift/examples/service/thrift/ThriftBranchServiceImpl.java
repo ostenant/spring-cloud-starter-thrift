@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ThriftService(name = "thriftBranchServiceImpl")
+@ThriftService(name = "thriftBranchService")
 public class ThriftBranchServiceImpl implements ThriftBranchService.Iface {
 
     private final BranchMapper branchMapper;

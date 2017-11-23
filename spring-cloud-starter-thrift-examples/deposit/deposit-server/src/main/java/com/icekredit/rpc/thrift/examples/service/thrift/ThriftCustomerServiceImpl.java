@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ThriftService(name = "thriftCustomerServiceImpl")
+@ThriftService(name = "thriftCustomerService")
 public class ThriftCustomerServiceImpl implements ThriftCustomerService.Iface {
 
     private final CustomerMapper customerMapper;

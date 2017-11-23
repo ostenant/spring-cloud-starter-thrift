@@ -3,6 +3,7 @@ package com.icekredit.rpc.thrift.examples.service.http.controller;
 import com.icekredit.rpc.thrift.examples.http.entities.Bank;
 import com.icekredit.rpc.thrift.examples.http.entities.Branch;
 import com.icekredit.rpc.thrift.examples.http.enums.Region;
+import com.icekredit.rpc.thrift.examples.http.service.IBankController;
 import com.icekredit.rpc.thrift.examples.service.http.service.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/http/bank")
-public class BankController {
+public class BankController implements IBankController {
 
     private final BankService bankService;
 

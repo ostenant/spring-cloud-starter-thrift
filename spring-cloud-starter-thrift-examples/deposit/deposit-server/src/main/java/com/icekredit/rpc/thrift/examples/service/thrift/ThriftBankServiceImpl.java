@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
-@ThriftService(name = "thriftBankServiceImpl")
+@ThriftService(name = "thriftBankService")
 public class ThriftBankServiceImpl implements ThriftBankService.Iface {
 
     private final BankMapper bankMapper;
