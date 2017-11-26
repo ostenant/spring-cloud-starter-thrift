@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+endpoints:
+  actuator:
+    sensitive: false
+    enabled: true
+management:
+  security:
+    enabled: false
+
+spring:
+  datasource:
+    druid:
+      url: jdbc:mysql://192.168.127.131:3306/deposit?useUnicode=true&characterEncoding=utf-8
+      driver-class-name: com.mysql.jdbc.Driver
+      username: root
+      password: root
+  thrift:
+    server:
+      service-id: deposit-server-rpc
+      service-model: hsHa
+      port: 25000
+      worker-queue-capacity: 1000
+      hs-ha:
+        min-worker-threads: 5
+        max-worker-threads: 20
+        keep-alived-time: 3
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.icekredit.rpc.thrift.examples.http.entities
+
+logging:
+  level:
+    root: INFO
+    com:
+      icekredit:
+        rpc:
+          thrift:
+            examples:
+              mapper: DEBUG

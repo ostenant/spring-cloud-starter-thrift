@@ -1,6 +1,7 @@
 package com.icekredit.rpc.thrift.client;
 
 import com.icekredit.rpc.thrift.client.annotation.ThriftReferer;
+import com.icekredit.rpc.thrift.client.common.ThriftClientAware;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientInstantiateException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,8 +17,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ThriftClientBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware {
 
@@ -102,6 +106,46 @@ public class ThriftClientBeanPostProcessor implements BeanPostProcessor, Applica
             }
 
         }, field -> (AnnotationUtils.getAnnotation(field, ThriftReferer.class) != null));
+
+        ReflectionUtils.MethodFilter methodFilter = method -> {
+            boolean basicCondition = AnnotationUtils.getAnnotation(method, ThriftReferer.class) != null
+                    && method.getParameterCount() > 0
+                    && method.getReturnType() == Void.TYPE;
+
+            if (!basicCondition) {
+                return false;
+            }
+
+            return Arrays.stream(method.getParameters())
+                    .map(Parameter::getType)
+                    .map(ThriftClientAware.class::isAssignableFrom)
+                    .reduce((param1, param2) -> param1 && param2)
+                    .get();
+        };
+
+        ReflectionUtils.doWithMethods(targetClass, method -> {
+            Parameter[] parameters = method.getParameters();
+            Object objectArray = Arrays.stream(parameters).map(parameter -> {
+                Class<?> parameterType = parameter.getType();
+                Map<String, ?> injectedBeanMap = applicationContext.getBeansOfType(parameterType);
+                if (MapUtils.isEmpty(injectedBeanMap)) {
+                    throw new ThriftClientInstantiateException("Detected non-qualified bean of {}" + parameterType.getSimpleName());
+                }
+
+                if (injectedBeanMap.size() > 1) {
+                    throw new ThriftClientInstantiateException("Detected ambiguous beans of {}" + parameterType.getSimpleName());
+                }
+
+                return injectedBeanMap.entrySet().stream()
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .orElseThrow(() -> new ThriftClientInstantiateException(
+                                "Detected non-qualified bean of {}" + parameterType.getSimpleName()));
+            }).collect(Collectors.toList()).toArray();
+
+            ReflectionUtils.makeAccessible(method);
+            ReflectionUtils.invokeMethod(method, targetBean, objectArray);
+        }, methodFilter);
 
         return bean;
     }
