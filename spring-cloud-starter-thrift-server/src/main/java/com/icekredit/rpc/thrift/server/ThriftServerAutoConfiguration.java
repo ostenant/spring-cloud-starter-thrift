@@ -57,25 +57,31 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
             Object bean = applicationContext.getBean(beanName);
             Object target = bean;
 
-            TargetSource targetSource = ((Advised) target).getTargetSource();
-            if (log.isDebugEnabled()) {
-                log.debug("Target object {} uses cglib proxy");
-            }
-
-            try {
-                target = targetSource.getTarget();
-            } catch (Exception e) {
-                throw new ThriftServerInstantiateException("Failed to get target bean from " + target, e);
-            }
-            final Object targetBean = target;
-
             ThriftService thriftService = bean.getClass().getAnnotation(ThriftService.class);
-
             String thriftServiceName = StringUtils.isEmpty(thriftService.value()) ? beanName : thriftService.value();
+
+            if(target instanceof Advised) {
+                final Object targetBean = target;
+                TargetSource targetSource = ((Advised) target).getTargetSource();
+                if (log.isDebugEnabled()) {
+                    log.debug("Target object {} uses cglib proxy");
+                }
+
+                try {
+                    target = targetSource.getTarget();
+                } catch (Exception e) {
+                    throw new ThriftServerInstantiateException("Failed to get target bean from " + target, e);
+                }
+
+                return ThriftServiceWrapperFactory.wrapper(
+                        properties.getServiceId(),
+                        thriftServiceName, targetBean,
+                        thriftService.version());
+            }
 
             return ThriftServiceWrapperFactory.wrapper(
                     properties.getServiceId(),
-                    thriftServiceName, targetBean,
+                    thriftServiceName, target,
                     thriftService.version());
 
         }).collect(Collectors.toList());

@@ -31,4 +31,4 @@ spring:
         pool-min-idle-per-key: 10
         pool-max-idle-per-key: 40
         pool-max-wait: 1000
-        connect-timeout: 100000
+        connect-timeout: 600000

@@ -5,7 +5,7 @@ import com.icekredit.rpc.thrift.server.processor.TRegisterProcessor;
 import com.icekredit.rpc.thrift.server.processor.TRegisterProcessorFactory;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
-import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingServerSocket;
@@ -24,7 +24,7 @@ public class TNonBlockingServerArgument extends TNonblockingServer.Args {
         super(new TNonblockingServerSocket(properties.getPort()));
 
         transportFactory(new TFramedTransport.Factory());
-        protocolFactory(new TBinaryProtocol.Factory());
+        protocolFactory(new TCompactProtocol.Factory());
 
         try {
             TRegisterProcessor registerProcessor = TRegisterProcessorFactory.registerProcessor(serviceWrappers);

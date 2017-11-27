@@ -9,13 +9,13 @@ public class ThriftClientPoolProperties {
 
     private int connectTimeout = 10000;
 
-    private int poolMaxTotalPerKey = 200;
+    private int poolMaxTotalPerKey = 60;
 
     private int poolMaxIdlePerKey = 40;
 
-    private int poolMinIdlePerKey = 10;
+    private int poolMinIdlePerKey = 3;
 
-    private long poolMaxWait = 10;
+    private long poolMaxWait = 180000;
 
     /**
      * 池对象创建时时验证是否正常可用
@@ -32,6 +32,11 @@ public class ThriftClientPoolProperties {
      * 池对象归还时验证是否正常可用
      */
     private boolean testOnReturn = true;
+
+    /**
+     * 空闲连接自动被空闲连接回收器
+     */
+    private boolean isTestWhileIdle = true;
 
     public int getRetryTimes() {
         return retryTimes;
@@ -103,5 +108,13 @@ public class ThriftClientPoolProperties {
 
     public void setTestOnReturn(boolean testOnReturn) {
         this.testOnReturn = testOnReturn;
+    }
+
+    public boolean isTestWhileIdle() {
+        return isTestWhileIdle;
+    }
+
+    public void setTestWhileIdle(boolean testWhileIdle) {
+        isTestWhileIdle = testWhileIdle;
     }
 }

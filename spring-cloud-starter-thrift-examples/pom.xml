@@ -10,6 +10,7 @@
     <modules>
         <module>calculator</module>
         <module>deposit</module>
+        <module>test</module>
     </modules>
     <packaging>pom</packaging>
 

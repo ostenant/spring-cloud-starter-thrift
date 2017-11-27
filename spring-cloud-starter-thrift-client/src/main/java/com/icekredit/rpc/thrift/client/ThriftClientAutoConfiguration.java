@@ -31,13 +31,15 @@ public class ThriftClientAutoConfiguration {
     public GenericKeyedObjectPoolConfig keyedObjectPoolConfig(ThriftClientProperties properties) {
         ThriftClientPoolProperties poolProperties = properties.getPool();
         GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
-        config.setMaxIdlePerKey(poolProperties.getPoolMaxIdlePerKey());
+        config.setMinIdlePerKey(poolProperties.getPoolMinIdlePerKey());
         config.setMaxIdlePerKey(poolProperties.getPoolMaxIdlePerKey());
         config.setMaxWaitMillis(poolProperties.getPoolMaxWait());
         config.setMaxTotalPerKey(poolProperties.getPoolMaxTotalPerKey());
         config.setTestOnCreate(poolProperties.isTestOnCreate());
         config.setTestOnBorrow(poolProperties.isTestOnBorrow());
         config.setTestOnReturn(poolProperties.isTestOnReturn());
+        config.setTestWhileIdle(poolProperties.isTestWhileIdle());
+        config.setFairness(true);
         config.setJmxEnabled(false);
         return config;
     }

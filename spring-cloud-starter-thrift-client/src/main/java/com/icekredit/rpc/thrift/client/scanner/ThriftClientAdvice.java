@@ -18,7 +18,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
-import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TTransport;
@@ -104,7 +104,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
             TTransport transport = null;
             try {
                 transport = objectPool.borrowObject(serverNode);
-                TProtocol protocol = new TBinaryProtocol(transport);
+                TProtocol protocol = new TCompactProtocol(transport);
                 TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol,
                         signature);
                 Object client = clientConstructor.newInstance(multiplexedProtocol);

@@ -5,7 +5,7 @@ import com.icekredit.rpc.thrift.server.processor.TRegisterProcessor;
 import com.icekredit.rpc.thrift.server.processor.TRegisterProcessorFactory;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
-import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
@@ -26,7 +26,7 @@ public class TSimpleServerArgument extends TSimpleServer.Args {
         super(new TServerSocket(new ServerSocket(properties.getPort())));
 
         transportFactory(new TTransportFactory());
-        protocolFactory(new TBinaryProtocol.Factory());
+        protocolFactory(new TCompactProtocol.Factory());
 
         try {
             TRegisterProcessor registerProcessor = TRegisterProcessorFactory.registerProcessor(serviceWrappers);
