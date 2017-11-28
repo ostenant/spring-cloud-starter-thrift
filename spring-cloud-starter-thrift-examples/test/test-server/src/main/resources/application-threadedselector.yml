@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+endpoints:
+  actuator:
+    sensitive: false
+    enabled: true
+management:
+  security:
+    enabled: false
+
+spring:
+  thrift:
+    server:
+      service-id: test-server-rpc
+      service-model: threadedSelector
+      port: 25000
+      worker-queue-capacity: 1000
+      threaded-selector:
+        accept-queue-size-per-thread: 1000
+        selector-threads: 3
+        min-worker-threads: 3
+        max-worker-threads: 20

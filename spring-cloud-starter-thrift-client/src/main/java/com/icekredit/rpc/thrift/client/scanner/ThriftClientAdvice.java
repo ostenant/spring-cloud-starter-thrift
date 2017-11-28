@@ -1,7 +1,10 @@
 package com.icekredit.rpc.thrift.client.scanner;
 
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.icekredit.rpc.thrift.client.common.ThriftClientContext;
+import com.icekredit.rpc.thrift.client.common.ThriftClientKey;
 import com.icekredit.rpc.thrift.client.common.ThriftServiceSignature;
 import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNode;
 import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNodeList;
@@ -48,6 +51,9 @@ public class ThriftClientAdvice implements MethodInterceptor {
 
     private TransportKeyedObjectPool objectPool;
 
+    private volatile Cache<ThriftClientKey, Object> thriftClientCache = CacheBuilder.newBuilder().maximumSize(102400).build();
+
+
     public ThriftClientAdvice(ThriftServiceSignature serviceSignature,
                               Constructor<? extends TServiceClient> clientConstructor) {
         this.serviceSignature = serviceSignature;
@@ -71,6 +77,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
 
         IRule routerRule = new RoundRobinRule();
         this.loadBalancer = new ThriftConsulServerListLoadBalancer(serverNodeList, routerRule);
+
         routerRule.setLoadBalancer(loadBalancer);
     }
 
@@ -90,6 +97,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
         ThriftConsulServerNode serverNode = loadBalancer.chooseServerNode(serviceId);
         String signature = serviceSignature.marker();
 
+        Method invocationMethod = invocation.getMethod();
         Object[] args = invocation.getArguments();
         int retryTimes = 0;
 
@@ -104,12 +112,14 @@ public class ThriftClientAdvice implements MethodInterceptor {
             TTransport transport = null;
             try {
                 transport = objectPool.borrowObject(serverNode);
+
                 TProtocol protocol = new TCompactProtocol(transport);
                 TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol,
                         signature);
-                Object client = clientConstructor.newInstance(multiplexedProtocol);
 
-                Method invocationMethod = invocation.getMethod();
+                ThriftClientKey thriftClientKey = new ThriftClientKey(signature, serverNode);
+
+                Object client = thriftClientCache.get(thriftClientKey, () -> clientConstructor.newInstance(multiplexedProtocol));
 
                 return ReflectionUtils.invokeMethod(invocationMethod, client, args);
 

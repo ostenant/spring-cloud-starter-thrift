@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+endpoints:
+  actuator:
+    sensitive: false
+    enabled: true
+management:
+  security:
+    enabled: false
+
+spring:
+  cloud:
+    consul:
+      host: 192.168.2.3
+      port: 8500
+      discovery:
+        register: false
+        register-health-check: true
+        health-check-interval: 30s
+      retry:
+        max-attempts: 3
+        max-interval: 2000
+  thrift:
+    client:
+      package-to-scan: com.icekredit.rpc.thrift.examples.thrift.client
+      service-model: hsHa
+      pool:
+        retry-times: 3
+        pool-max-total-per-key: 200
+        pool-min-idle-per-key: 1
+        pool-max-idle-per-key: 40
+        pool-max-wait: 100000
+        connect-timeout: 600000

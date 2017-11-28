@@ -3,7 +3,7 @@ package com.icekredit.rpc.thrift.client.scanner;
 import com.icekredit.rpc.thrift.client.common.ThriftServiceSignature;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TProtocol;
-import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.Constructor;
@@ -19,7 +19,7 @@ public class ThriftClientInvocationHandler implements InvocationHandler {
 
     private Constructor<? extends TServiceClient> clientConstructor;
 
-    private ProxyFactory proxyFactory;
+    private ProxyFactoryBean proxyFactoryBean;
 
     public ThriftClientInvocationHandler(ThriftServiceSignature serviceSignature,
                                          Class<?> clientClass,
@@ -27,30 +27,35 @@ public class ThriftClientInvocationHandler implements InvocationHandler {
         this.serviceSignature = serviceSignature;
         this.clientClass = clientClass;
         this.clientConstructor = clientConstructor;
-        this.proxyFactory = initializeProxyFactory();
+        this.proxyFactoryBean = initializeProxyFactoryBean();
     }
 
     @SuppressWarnings("unchecked")
-    private ProxyFactory initializeProxyFactory() throws Exception {
+    private ProxyFactoryBean initializeProxyFactoryBean() throws Exception {
         Constructor<?> constructor = clientConstructor;
         if (Objects.isNull(constructor)) {
             constructor = clientClass.getConstructor(TProtocol.class);
         }
 
         Object target = BeanUtils.instantiateClass(constructor, (TProtocol) null);
-        ProxyFactory proxyFactory = new ProxyFactory(target);
+
+        ProxyFactoryBean factoryBean = new ProxyFactoryBean();
+        factoryBean.setTarget(target);
+        factoryBean.setBeanClassLoader(getClass().getClassLoader());
 
         ThriftClientAdvice clientAdvice = new ThriftClientAdvice(serviceSignature, clientConstructor);
-        proxyFactory.addAdvice(clientAdvice);
-        proxyFactory.setProxyTargetClass(true);
-        proxyFactory.setFrozen(true);
+        factoryBean.addAdvice(clientAdvice);
 
-        return proxyFactory;
+        factoryBean.setProxyTargetClass(true);
+        factoryBean.setSingleton(true);
+        factoryBean.setOptimize(true);
+        factoryBean.setFrozen(true);
+        return factoryBean;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return proxyFactory.getProxy();
+        return proxyFactoryBean.getObject();
     }
 
 }
