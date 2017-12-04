@@ -1,10 +1,8 @@
 package com.icekredit.rpc.thrift.client.scanner;
 
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.icekredit.rpc.thrift.client.cache.ThriftServiceMethodCacheManager;
 import com.icekredit.rpc.thrift.client.common.ThriftClientContext;
-import com.icekredit.rpc.thrift.client.common.ThriftClientKey;
 import com.icekredit.rpc.thrift.client.common.ThriftServiceSignature;
 import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNode;
 import com.icekredit.rpc.thrift.client.discovery.ThriftConsulServerNodeList;
@@ -21,7 +19,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
-import org.apache.thrift.protocol.TCompactProtocol;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TTransport;
@@ -50,9 +48,6 @@ public class ThriftClientAdvice implements MethodInterceptor {
     private ThriftClientProperties properties;
 
     private TransportKeyedObjectPool objectPool;
-
-    private volatile Cache<ThriftClientKey, Object> thriftClientCache = CacheBuilder.newBuilder().maximumSize(102400).build();
-
 
     public ThriftClientAdvice(ThriftServiceSignature serviceSignature,
                               Constructor<? extends TServiceClient> clientConstructor) {
@@ -101,27 +96,30 @@ public class ThriftClientAdvice implements MethodInterceptor {
         Object[] args = invocation.getArguments();
         int retryTimes = 0;
 
+        TTransport transport = null;
+
         while (true) {
-            if (++retryTimes == poolProperties.getRetryTimes()) {
+            if (retryTimes++ > poolProperties.getRetryTimes()) {
                 log.error(
                         "All thrift client call failed, method is {}, args is {}, retryTimes: {}",
                         invocation.getMethod().getName(), args, retryTimes);
                 throw new ThriftClientException("Thrift client call failed, thrift client signature is: " + serviceSignature.marker());
             }
 
-            TTransport transport = null;
             try {
                 transport = objectPool.borrowObject(serverNode);
 
-                TProtocol protocol = new TCompactProtocol(transport);
+                TProtocol protocol = new TBinaryProtocol(transport);
                 TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol,
                         signature);
 
-                ThriftClientKey thriftClientKey = new ThriftClientKey(signature, serverNode);
+                Object client = clientConstructor.newInstance(multiplexedProtocol);
 
-                Object client = thriftClientCache.get(thriftClientKey, () -> clientConstructor.newInstance(multiplexedProtocol));
+                Method cachedMethod = ThriftServiceMethodCacheManager.getMethod(client.getClass(),
+                        invocationMethod.getName(),
+                        invocationMethod.getParameterTypes());
 
-                return ReflectionUtils.invokeMethod(invocationMethod, client, args);
+                return ReflectionUtils.invokeMethod(cachedMethod, client, args);
 
             } catch (IllegalArgumentException | IllegalAccessException | InstantiationException | SecurityException | NoSuchMethodException e) {
                 throw new ThriftClientOpenException("Unable to open thrift client", e);
@@ -155,20 +153,29 @@ public class ThriftClientAdvice implements MethodInterceptor {
                         if (transport != null) {
                             transport.close();
                         }
-
                     }
+
+
                 } else if (undeclaredThrowable instanceof TApplicationException) {  // 有可能服务端返回的结果里存在null
                     log.error(
-                            "Thrift end of file, ip is {}, port is {}, timeout is {}, method is {}, args is {}",
+                            "Thrift end of file, ip is {}, port is {}, timeout is {}, method is {}, args is {}, retryTimes is {}",
                             serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout(),
-                            invocation.getMethod(), args);
-                    throw new ThriftApplicationException("Thrift end of file", e);
+                            invocation.getMethod(), args, retryTimes);
+                    if (retryTimes >= poolProperties.getRetryTimes()) {
+                        throw new ThriftApplicationException("Thrift end of file", e);
+                    }
+
+                    objectPool.clear(serverNode);
+                    if (transport != null) {
+                        transport.close();
+                    }
 
                 } else if (undeclaredThrowable instanceof TException) { // idl exception
                     throw undeclaredThrowable;
+                } else {
+                    // Unknown Exception
+                    throw e;
                 }
-                // Unknown Exception
-                throw e;
 
             } catch (Exception e) {
                 if (e instanceof ThriftClientOpenException) { // 创建连接失败
@@ -177,6 +184,8 @@ public class ThriftClientAdvice implements MethodInterceptor {
                     if (realCause instanceof SocketException && realCause.getMessage().contains("Network is unreachable")) {
                         throw e;
                     }
+                } else {
+                    throw e;
                 }
             } finally {
                 try {

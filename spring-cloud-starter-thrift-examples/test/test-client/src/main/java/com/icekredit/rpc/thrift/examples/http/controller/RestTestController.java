@@ -23,7 +23,6 @@ public class RestTestController {
         stopWatch.start();
 
         String result = feignClient.test(length);
-//        String result = restTemplate.getForObject("http://test-server-rest/http/test?length=" + length, String.class);
         System.out.println(result.getBytes().length);
 
         stopWatch.stop();

@@ -3,19 +3,17 @@ package com.icekredit.rpc.thrift.client.pool;
 import com.icekredit.rpc.thrift.client.common.ThriftServerNode;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientConfigException;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientOpenException;
-import com.icekredit.rpc.thrift.client.factory.ThriftTransportFactory;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientPoolProperties;
 import com.icekredit.rpc.thrift.client.properties.ThriftClientProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
-import org.apache.commons.pool2.impl.PooledSoftReference;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
 import java.util.Objects;
 
 public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFactory<ThriftServerNode, TTransport> {
@@ -64,17 +62,19 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
 
     @Override
     public PooledObject<TTransport> wrap(TTransport value) {
-        SoftReference<TTransport> softReference = new SoftReference<>(value);
-        return new PooledSoftReference<>(softReference);
+        return new DefaultPooledObject<>(value);
     }
 
     @Override
     public boolean validateObject(ThriftServerNode key, PooledObject<TTransport> value) {
-        PooledSoftReference<TTransport> softReference = (PooledSoftReference<TTransport>) value;
-        TTransport transport = softReference.getObject();
+        if (Objects.isNull(value)) {
+            log.warn("PooledObject is already null");
+            return false;
+        }
 
+        TTransport transport = value.getObject();
         if (Objects.isNull(transport)) {
-            log.warn("Pooled transport has been destroyed, information: {}" + softReference.toString());
+            log.warn("Pooled transport is already null");
             return false;
         }
 
@@ -88,19 +88,13 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
 
     @Override
     public void destroyObject(ThriftServerNode key, PooledObject<TTransport> value) throws Exception {
-        PooledSoftReference<TTransport> softReference = (PooledSoftReference<TTransport>) value;
-        TTransport transport = softReference.getObject();
-
-        if (Objects.isNull(transport)) {
-            log.warn("Pooled transport has been destroyed, information: {}" + softReference.toString());
-            return;
+        if (Objects.nonNull(value)) {
+            TTransport transport = value.getObject();
+            if (Objects.nonNull(transport)) {
+                transport.close();
+            }
+            value.markAbandoned();
         }
-
-        if (transport.isOpen()) {
-            log.info("Pooled transport is destroyed normally");
-            transport.close();
-        }
-
     }
 
 }

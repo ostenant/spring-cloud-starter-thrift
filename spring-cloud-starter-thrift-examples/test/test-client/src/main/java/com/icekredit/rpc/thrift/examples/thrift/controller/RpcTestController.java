@@ -19,8 +19,7 @@ public class RpcTestController {
 
         stopWatch.start();
 
-        String result = thriftClient.thriftClient().test(length);
-        System.out.println(result.getBytes().length);
+        thriftClient.thriftClient().test(length);
 
         stopWatch.stop();
 

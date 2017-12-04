@@ -17,6 +17,6 @@ spring:
       port: 25000
       worker-queue-capacity: 1000
       hs-ha:
-        min-worker-threads: 5
-        max-worker-threads: 5
+        min-worker-threads: 2
+        max-worker-threads: 20
         keep-alived-time: 1000000

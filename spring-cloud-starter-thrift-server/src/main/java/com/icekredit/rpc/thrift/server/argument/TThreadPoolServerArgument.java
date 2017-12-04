@@ -7,7 +7,7 @@ import com.icekredit.rpc.thrift.server.properties.TThreadPoolServerProperties;
 import com.icekredit.rpc.thrift.server.properties.TThreadedSelectorServerProperties;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
-import org.apache.thrift.protocol.TCompactProtocol;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
@@ -32,7 +32,7 @@ public class TThreadPoolServerArgument extends TThreadPoolServer.Args {
         super(new TServerSocket(new ServerSocket(properties.getPort())));
 
         transportFactory(new TTransportFactory());
-        protocolFactory(new TCompactProtocol.Factory());
+        protocolFactory(new TBinaryProtocol.Factory());
 
         TThreadPoolServerProperties threadPoolProperties = properties.getThreadPool();
 

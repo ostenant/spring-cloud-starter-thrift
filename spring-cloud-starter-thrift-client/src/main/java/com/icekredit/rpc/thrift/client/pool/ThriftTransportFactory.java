@@ -1,4 +1,4 @@
-package com.icekredit.rpc.thrift.client.factory;
+package com.icekredit.rpc.thrift.client.pool;
 
 import com.icekredit.rpc.thrift.client.common.ThriftServerNode;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientConfigException;
