@@ -28,7 +28,7 @@ spring:
       pool:
         retry-times: 3
         pool-max-total-per-key: 1000
-        pool-min-idle-per-key: 5
-        pool-max-idle-per-key: 40
+        pool-min-idle-per-key: 10
+        pool-max-idle-per-key: 100
         pool-max-wait: 100000
         connect-timeout: 600000

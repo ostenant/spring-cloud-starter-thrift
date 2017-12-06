@@ -13,29 +13,29 @@ import java.util.stream.Collectors;
 public class CustomerRpcController {
 
     @ThriftReferer
-    CustomerThriftClient thriftClient;
+    private CustomerThriftClient thriftClient;
 
 
     @GetMapping("/getCustomerById")
     public Customer getCustomerById(@RequestParam("customerId") String customerId) throws Exception {
-        return Customer.fromThrift(thriftClient.thriftClient().getCustomerById(customerId));
+        return Customer.fromThrift(thriftClient.client().getCustomerById(customerId));
     }
 
     @GetMapping("/queryAllCustomers")
     public List<Customer> queryAllCustomers() throws Exception {
-        return thriftClient.thriftClient().queryAllCustomers()
+        return thriftClient.client().queryAllCustomers()
                 .stream().map(Customer::fromThrift)
                 .collect(Collectors.toList());
     }
 
     @PostMapping("/addNewCustomer")
     public void addNewCustomer(Customer customer) throws Exception {
-        thriftClient.thriftClient().addNewUser(customer.toThrift());
+        thriftClient.client().addNewUser(customer.toThrift());
     }
 
     @GetMapping("/getTotalDepositCards")
     public Integer getTotalDepositCards(@RequestParam("customerId") String customerId) throws Exception {
-        return thriftClient.thriftClient().getTotalDepositCard(customerId);
+        return thriftClient.client().getTotalDepositCard(customerId);
     }
 
 }

@@ -18,6 +18,6 @@ spring:
       worker-queue-capacity: 10000
       threaded-selector:
         accept-queue-size-per-thread: 10000
-        selector-threads: 5
-        min-worker-threads: 10
-        max-worker-threads: 30
+        selector-threads: 40
+        min-worker-threads: 100
+        max-worker-threads: 400

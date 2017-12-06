@@ -4,5 +4,5 @@ import org.apache.thrift.TServiceClient;
 
 public interface ThriftClientAware<T extends TServiceClient> {
 
-    T thriftClient();
+    T client();
 }

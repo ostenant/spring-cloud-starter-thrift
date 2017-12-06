@@ -19,21 +19,21 @@ import java.util.stream.Collectors;
 public class BankRpcController {
 
     @ThriftReferer
-    BankThriftClient thriftClient;
+    private BankThriftClient thriftClient;
 
     @PostMapping("/addNewBank")
     public void addNewBank(Bank bank) throws Exception {
-        thriftClient.thriftClient().registerNewBank(bank.toThrift());
+        thriftClient.client().registerNewBank(bank.toThrift());
     }
 
     @GetMapping("/getBankById")
     public Bank getBankById(@RequestParam("bankId") Long bankId) throws Exception {
-        return Bank.fromThrift(thriftClient.thriftClient().getBankById(bankId));
+        return Bank.fromThrift(thriftClient.client().getBankById(bankId));
     }
 
     @GetMapping("/queryAllBranchesByRegion")
     public Map<Region, List<Branch>> queryAllBranchesByRegion(@RequestParam("bankId") Long bankId) throws Exception {
-        Map<ThriftRegion, List<ThriftBranch>> thriftRegionListMap = thriftClient.thriftClient()
+        Map<ThriftRegion, List<ThriftBranch>> thriftRegionListMap = thriftClient.client()
                 .queryAllBranchesByRegion(bankId);
         Map<Region, List<Branch>> regionListMap = new HashMap<>();
 

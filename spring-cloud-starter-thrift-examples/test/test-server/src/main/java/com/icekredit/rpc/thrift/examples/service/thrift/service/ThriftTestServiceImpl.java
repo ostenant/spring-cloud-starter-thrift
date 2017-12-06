@@ -20,6 +20,8 @@ public class ThriftTestServiceImpl implements TestService.Iface {
     private static final String KB_10_STR;
     private static final String KB_100_STR;
 
+    private static final String DEFAULT_UUID = UUID.randomUUID().toString().replace("-", "");
+
     static {
         Random random = new Random();
         for (int i = 0; i < KB_1.length; i++) {
@@ -52,7 +54,7 @@ public class ThriftTestServiceImpl implements TestService.Iface {
         }
 
         if (length == 0) {
-            result = UUID.randomUUID().toString().replace("-", "");
+            result = DEFAULT_UUID;
         }
 
         System.out.println("Call RPC Test, data length: " + length + "KB");

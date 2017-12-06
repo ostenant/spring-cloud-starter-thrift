@@ -20,6 +20,8 @@ public class TestServiceImpl implements TestService {
     private static final String KB_10_STR;
     private static final String KB_100_STR;
 
+    private static final String DEFAULT_UUID = UUID.randomUUID().toString().replace("-", "");
+
     static {
         Random random = new Random();
         for (int i = 0; i < KB_1.length; i++) {
@@ -53,7 +55,7 @@ public class TestServiceImpl implements TestService {
         }
 
         if (length == 0) {
-            result = UUID.randomUUID().toString().replace("-", "");
+            result = DEFAULT_UUID;
         }
 
         System.out.println("Call Rest Test, data length: " + length + "KB");

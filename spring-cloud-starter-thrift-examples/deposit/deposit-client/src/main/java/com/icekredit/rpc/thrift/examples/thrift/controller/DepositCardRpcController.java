@@ -17,37 +17,37 @@ import java.util.stream.Collectors;
 public class DepositCardRpcController {
 
     @ThriftReferer
-    DepositCardThriftClient thriftClient;
+    private DepositCardThriftClient thriftClient;
 
     @GetMapping("/queryAllDepositCards")
     public List<DepositCard> queryAllDepositCards(@RequestParam("customerId") String customerId)
             throws Exception {
-        return thriftClient.thriftClient().queryAllDepositCards(customerId)
+        return thriftClient.client().queryAllDepositCards(customerId)
                 .stream().map(DepositCard::fromThrift)
                 .collect(Collectors.toList());
     }
 
     @PostMapping("/addNewDepositCard")
     public void addNewDepositCard(DepositCard depositCard) throws Exception {
-        thriftClient.thriftClient().addNewDepositCard(depositCard.getCustomerId(), depositCard.toThrift());
+        thriftClient.client().addNewDepositCard(depositCard.getCustomerId(), depositCard.toThrift());
     }
 
     @GetMapping("/depositMoney")
     public ThriftDepositStatus depositMoney(@RequestParam("depositCardId") String depositCardId,
                                             @RequestParam("money") Double money) throws Exception {
-        return thriftClient.thriftClient().depositMoney(depositCardId, money);
+        return thriftClient.client().depositMoney(depositCardId, money);
     }
 
     @GetMapping("/withdrawMoney")
     public ThriftWithdrawStatus withdrawMoney(@RequestParam("depositCardId") String depositCardId,
                                               @RequestParam("money") Double money) throws Exception {
-        return thriftClient.thriftClient().withdrawMoney(depositCardId, money);
+        return thriftClient.client().withdrawMoney(depositCardId, money);
     }
 
     @GetMapping("/queryDepositHistory")
     public List<DepositHistory> queryDepositHistory(@RequestParam("depositCardId") String depositCardId)
             throws Exception {
-        return thriftClient.thriftClient().queryDepositHistorys(depositCardId)
+        return thriftClient.client().queryDepositHistorys(depositCardId)
                 .stream().map(DepositHistory::fromThrift)
                 .collect(Collectors.toList());
     }
@@ -55,7 +55,7 @@ public class DepositCardRpcController {
     @GetMapping("/queryWithdrawHistory")
     public List<WithdrawHistory> queryWithdrawHistory(@RequestParam("depositCardId") String depositCardId)
             throws Exception {
-        return thriftClient.thriftClient().queryWithdrawHistorys(depositCardId)
+        return thriftClient.client().queryWithdrawHistorys(depositCardId)
                 .stream().map(WithdrawHistory::fromThrift)
                 .collect(Collectors.toList());
     }

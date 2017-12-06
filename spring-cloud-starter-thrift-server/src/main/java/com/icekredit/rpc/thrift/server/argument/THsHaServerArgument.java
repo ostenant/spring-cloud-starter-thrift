@@ -6,9 +6,9 @@ import com.icekredit.rpc.thrift.server.processor.TRegisterProcessorFactory;
 import com.icekredit.rpc.thrift.server.properties.THsHaServerProperties;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
-import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.server.THsHaServer;
-import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TFastFramedTransport;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.apache.thrift.transport.TTransportException;
 
@@ -28,8 +28,8 @@ public class THsHaServerArgument extends THsHaServer.Args {
             throws TTransportException {
         super(new TNonblockingServerSocket(properties.getPort()));
 
-        transportFactory(new TFramedTransport.Factory());
-        protocolFactory(new TBinaryProtocol.Factory());
+        transportFactory(new TFastFramedTransport.Factory());
+        protocolFactory(new TCompactProtocol.Factory());
 
         THsHaServerProperties hsHaProperties = properties.getHsHa();
         minWorkerThreads(hsHaProperties.getMinWorkerThreads());

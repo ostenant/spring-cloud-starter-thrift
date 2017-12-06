@@ -4,7 +4,7 @@ import com.icekredit.rpc.thrift.client.common.ThriftServerNode;
 import com.icekredit.rpc.thrift.client.exception.ThriftClientConfigException;
 import com.icekredit.rpc.thrift.client.properties.TServiceModel;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TFastFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class ThriftTransportFactory {
     }
 
     private static TTransport createTFramedTransport(String serviceModel, ThriftServerNode serverNode, int connectTimeout) {
-        TTransport transport = new TFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort(),
+        TTransport transport = new TFastFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort(),
                 connectTimeout > 0 ? connectTimeout : CONNECT_TIMEOUT));
         log.info("Established a new framed transport, service model is {}", serviceModel);
         return transport;
