@@ -8,7 +8,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
@@ -40,8 +39,7 @@ public class ThriftClientBeanScannerConfigurer implements ApplicationContextAwar
         beanScanner.setBeanNameGenerator(new AnnotationBeanNameGenerator());
         beanScanner.setScopedProxyMode(ScopedProxyMode.INTERFACES);
 
-        RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(applicationContext.getEnvironment());
-        setScannedPackages(beanScanner, propertyResolver.getProperty(SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN));
+        setScannedPackages(beanScanner, applicationContext.getEnvironment().getProperty(SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN));
     }
 
     private void setScannedPackages(ThriftClientBeanScanner beanScanner, String basePackages) {

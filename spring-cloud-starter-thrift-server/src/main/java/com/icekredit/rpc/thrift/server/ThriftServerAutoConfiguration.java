@@ -6,7 +6,6 @@ import com.icekredit.rpc.thrift.server.context.ThriftServerContext;
 import com.icekredit.rpc.thrift.server.exception.ThriftServerException;
 import com.icekredit.rpc.thrift.server.exception.ThriftServerInstantiateException;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
-import com.icekredit.rpc.thrift.server.properties.ThriftServerPropertiesCondition;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapperFactory;
 import org.apache.thrift.transport.TTransportException;
@@ -21,7 +20,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
