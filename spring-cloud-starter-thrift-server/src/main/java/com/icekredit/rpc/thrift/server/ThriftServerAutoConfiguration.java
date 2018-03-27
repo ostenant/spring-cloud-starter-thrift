@@ -6,7 +6,6 @@ import com.icekredit.rpc.thrift.server.context.ThriftServerContext;
 import com.icekredit.rpc.thrift.server.exception.ThriftServerException;
 import com.icekredit.rpc.thrift.server.exception.ThriftServerInstantiateException;
 import com.icekredit.rpc.thrift.server.properties.ThriftServerProperties;
-import com.icekredit.rpc.thrift.server.properties.ThriftServerPropertiesCondition;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapper;
 import com.icekredit.rpc.thrift.server.wrapper.ThriftServiceWrapperFactory;
 import org.apache.thrift.transport.TTransportException;
@@ -16,11 +15,11 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
@@ -31,7 +30,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Configuration
-@Conditional(ThriftServerPropertiesCondition.class)
+@ConditionalOnProperty(value = "spring.thrift.server.service-id",matchIfMissing = false)
 @EnableConfigurationProperties(ThriftServerProperties.class)
 public class ThriftServerAutoConfiguration implements ApplicationContextAware {
 
