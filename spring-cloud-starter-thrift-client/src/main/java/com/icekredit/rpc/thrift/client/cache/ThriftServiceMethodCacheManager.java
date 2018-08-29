@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Objects;
 
 public class ThriftServiceMethodCacheManager {
 
@@ -26,7 +27,10 @@ public class ThriftServiceMethodCacheManager {
         ThriftServiceMethodCache methodCache = methodCachedMap.get(targetClass.getName());
         if (methodCache == null) {
             methodCache = new ThriftServiceMethodCache(targetClass);
-            methodCachedMap.put(targetClass.getName(), methodCache);
+            ThriftServiceMethodCache tmp = methodCachedMap.putIfAbsent(targetClass.getName(), methodCache);
+            if(!Objects.isNull(tmp)){
+            	methodCache = tmp;
+            }
         }
         return methodCache;
     }
