@@ -15,12 +15,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractThriftServerContext {
 
+    private final Lock thriftServerLock = new ReentrantLock();
     protected ThriftServerProperties properties;
     protected List<ThriftServiceWrapper> serviceWrappers;
-
     private volatile TServer thriftServer;
-
-    private final Lock thriftServerLock = new ReentrantLock();
 
     public TServer buildServer() throws TTransportException, IOException {
         if (Objects.isNull(thriftServer)) {
@@ -36,29 +34,28 @@ public abstract class AbstractThriftServerContext {
 
     private TServer build() throws TTransportException, IOException {
         String serviceModel = properties.getServiceModel();
-        TServer tServer = null;
 
-        if (StringUtils.equals(TServiceModel.SERVICE_MODEL_SIMPLE, serviceModel)) {
-            tServer = buildTSimpleServer();
+        switch (serviceModel) {
+            case TServiceModel.SERVICE_MODEL_SIMPLE:
+                thriftServer = buildTSimpleServer();
+                break;
+            case TServiceModel.SERVICE_MODEL_NON_BLOCKING:
+                thriftServer = buildTNonBlockingServer();
+                break;
+            case TServiceModel.SERVICE_MODEL_THREAD_POOL:
+                thriftServer = buildTThreadPoolServer();
+                break;
+            case TServiceModel.SERVICE_MODEL_HS_HA:
+                thriftServer = buildTHsHaServer();
+                break;
+            case TServiceModel.SERVICE_MODEL_THREADED_SELECTOR:
+                thriftServer = buildTThreadedSelectorServer();
+                break;
+            default:
+                thriftServer = buildDefaultTServer();
+                break;
         }
 
-        if (StringUtils.equals(TServiceModel.SERVICE_MODEL_NON_BLOCKING, serviceModel)) {
-            tServer = buildTNonBlockingServer();
-        }
-
-        if (StringUtils.equals(TServiceModel.SERVICE_MODEL_THREAD_POOL, serviceModel)) {
-            tServer = buildTThreadPoolServer();
-        }
-
-        if (StringUtils.equals(TServiceModel.SERVICE_MODEL_HS_HA, serviceModel)) {
-            tServer = buildTHsHaServer();
-        }
-
-        if (StringUtils.equals(TServiceModel.SERVICE_MODEL_THREADED_SELECTOR, serviceModel)) {
-            tServer = buildTThreadedSelectorServer();
-        }
-
-        thriftServer = Objects.isNull(tServer) ? buildDefaultTServer() : tServer;
         return getThriftServer();
     }
 

@@ -51,7 +51,6 @@ public class TThreadedSelectorServerArgument extends TThreadedSelectorServer.Arg
         }
     }
 
-
     private ExecutorService createInvokerPool(ThriftServerProperties properties) {
         TThreadedSelectorServerProperties threadedSelectorProperties = properties.getThreadedSelector();
 

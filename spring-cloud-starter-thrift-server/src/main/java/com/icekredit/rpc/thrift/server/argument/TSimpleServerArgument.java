@@ -40,7 +40,6 @@ public class TSimpleServerArgument extends TSimpleServer.Args {
         }
     }
 
-
     public Map<String, ThriftServiceWrapper> getProcessorMap() {
         return processorMap;
     }

@@ -23,7 +23,6 @@ public class ThriftServerContext extends AbstractThriftServerContext {
     public ThriftServerContext(ThriftServerProperties properties, List<ThriftServiceWrapper> serviceWrappers) {
         this.properties = properties;
         this.serviceWrappers = serviceWrappers;
-
         contextInitializing();
     }
 

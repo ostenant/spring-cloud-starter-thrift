@@ -32,16 +32,11 @@ public class TThreadPoolServerContext implements ContextBuilder {
     }
 
     @Override
-    public TServer buildThriftServer(ThriftServerProperties properties, List<ThriftServiceWrapper> serviceWrappers) throws TTransportException, IOException {
-        if (Objects.isNull(serverContext)) {
-            serverContext = (TThreadPoolServerContext) prepare();
-            serverContext.args = new TThreadPoolServerArgument(serviceWrappers, properties);
-        }
-
-        if (Objects.nonNull(serverContext) && Objects.isNull(args)) {
-            serverContext.args = new TThreadPoolServerArgument(serviceWrappers, properties);
-        }
-
+    public TServer buildThriftServer(ThriftServerProperties properties,
+                                     List<ThriftServiceWrapper> serviceWrappers)
+            throws TTransportException, IOException {
+        serverContext = (TThreadPoolServerContext) prepare();
+        serverContext.args = new TThreadPoolServerArgument(serviceWrappers, properties);
         return new TThreadPoolServer(serverContext.args);
     }
 

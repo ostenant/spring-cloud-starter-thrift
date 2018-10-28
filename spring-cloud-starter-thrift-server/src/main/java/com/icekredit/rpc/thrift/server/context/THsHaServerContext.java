@@ -32,16 +32,11 @@ public class THsHaServerContext implements ContextBuilder {
     }
 
     @Override
-    public TServer buildThriftServer(ThriftServerProperties properties, List<ThriftServiceWrapper> serviceWrappers) throws TTransportException, IOException {
-        if (Objects.isNull(serverContext)) {
-            serverContext = (THsHaServerContext) prepare();
-            serverContext.args = new THsHaServerArgument(serviceWrappers, properties);
-        }
-
-        if (Objects.nonNull(serverContext) && Objects.isNull(args)) {
-            serverContext.args = new THsHaServerArgument(serviceWrappers, properties);
-        }
-
+    public TServer buildThriftServer(ThriftServerProperties properties,
+                                     List<ThriftServiceWrapper> serviceWrappers)
+            throws TTransportException, IOException {
+        serverContext = (THsHaServerContext) prepare();
+        serverContext.args = new THsHaServerArgument(serviceWrappers, properties);
         return new THsHaServer(args);
     }
 

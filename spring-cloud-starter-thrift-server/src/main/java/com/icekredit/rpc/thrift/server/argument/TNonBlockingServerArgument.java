@@ -38,7 +38,6 @@ public class TNonBlockingServerArgument extends TNonblockingServer.Args {
         }
     }
 
-
     public Map<String, ThriftServiceWrapper> getProcessorMap() {
         return processorMap;
     }

@@ -32,16 +32,11 @@ public class TSimpleServerContext implements ContextBuilder {
     }
 
     @Override
-    public TServer buildThriftServer(ThriftServerProperties properties, List<ThriftServiceWrapper> serviceWrappers) throws TTransportException, IOException {
-        if (Objects.isNull(serverContext)) {
-            serverContext = (TSimpleServerContext) prepare();
-            serverContext.args = new TSimpleServerArgument(serviceWrappers, properties);
-        }
-
-        if (Objects.nonNull(serverContext) && Objects.isNull(args)) {
-            serverContext.args = new TSimpleServerArgument(serviceWrappers, properties);
-        }
-
+    public TServer buildThriftServer(ThriftServerProperties properties,
+                                     List<ThriftServiceWrapper> serviceWrappers)
+            throws TTransportException, IOException {
+        serverContext = (TSimpleServerContext) prepare();
+        serverContext.args = new TSimpleServerArgument(serviceWrappers, properties);
         return new TSimpleServer(serverContext.args);
     }
 

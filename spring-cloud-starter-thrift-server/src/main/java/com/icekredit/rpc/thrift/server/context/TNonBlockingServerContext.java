@@ -32,16 +32,11 @@ public class TNonBlockingServerContext implements ContextBuilder {
     }
 
     @Override
-    public TServer buildThriftServer(ThriftServerProperties properties, List<ThriftServiceWrapper> serviceWrappers) throws TTransportException, IOException {
-        if (Objects.isNull(serverContext)) {
-            serverContext = (TNonBlockingServerContext) prepare();
-            serverContext.args = new TNonBlockingServerArgument(serviceWrappers, properties);
-        }
-
-        if (Objects.nonNull(serverContext) && Objects.isNull(args)) {
-            serverContext.args = new TNonBlockingServerArgument(serviceWrappers, properties);
-        }
-
+    public TServer buildThriftServer(ThriftServerProperties properties,
+                                     List<ThriftServiceWrapper> serviceWrappers)
+            throws TTransportException, IOException {
+        serverContext = (TNonBlockingServerContext) prepare();
+        serverContext.args = new TNonBlockingServerArgument(serviceWrappers, properties);
         return new TNonblockingServer(serverContext.args);
     }
 

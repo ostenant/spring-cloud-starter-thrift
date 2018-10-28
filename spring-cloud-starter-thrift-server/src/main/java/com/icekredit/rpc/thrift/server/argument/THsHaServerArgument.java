@@ -47,7 +47,6 @@ public class THsHaServerArgument extends THsHaServer.Args {
         } catch (Exception e) {
             throw new ThriftServerException("Can not create multiplexed processor for " + serviceWrappers, e);
         }
-
     }
 
     private ExecutorService createInvokerPool(ThriftServerProperties properties) {

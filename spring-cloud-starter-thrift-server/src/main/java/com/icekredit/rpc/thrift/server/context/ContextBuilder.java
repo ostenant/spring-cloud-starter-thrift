@@ -12,6 +12,8 @@ public interface ContextBuilder {
 
     ContextBuilder prepare();
 
-    TServer buildThriftServer(ThriftServerProperties properties, List<ThriftServiceWrapper> serviceWrappers) throws TTransportException, IOException;
+    TServer buildThriftServer(ThriftServerProperties properties,
+                              List<ThriftServiceWrapper> serviceWrappers)
+            throws TTransportException, IOException;
 
 }
