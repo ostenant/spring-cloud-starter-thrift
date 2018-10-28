@@ -1,4 +1,4 @@
-namespace java com.icekredit.rpc.thrift.examples.thrift
+namespace java io.ostenant.rpc.thrift.examples.thrift
 
 enum ThriftRegion {
    NORTH = 1,

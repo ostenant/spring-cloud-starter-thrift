@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.icekredit.rpc.thrift.examples.mapper.DepositCardMapper">
-    <resultMap id="BaseResultMap" type="com.icekredit.rpc.thrift.examples.http.entities.DepositCard">
+<mapper namespace="io.ostenant.rpc.thrift.examples.mapper.DepositCardMapper">
+    <resultMap id="BaseResultMap" type="io.ostenant.rpc.thrift.examples.http.entities.DepositCard">
         <id column="id" jdbcType="VARCHAR" property="id"/>
         <result column="is_vip" jdbcType="BIT" property="isVip"/>
         <result column="opening_time" jdbcType="VARCHAR" property="openingTime"/>
@@ -31,7 +31,7 @@
     </delete>
 
 
-    <insert id="save" parameterType="com.icekredit.rpc.thrift.examples.http.entities.DepositCard">
+    <insert id="save" parameterType="io.ostenant.rpc.thrift.examples.http.entities.DepositCard">
         INSERT INTO deposit_card (id, is_vip, opening_time,
                                   account_balance, account_flow, branch_id,
                                   customer_id)
@@ -41,7 +41,7 @@
     </insert>
 
 
-    <update id="update" parameterType="com.icekredit.rpc.thrift.examples.http.entities.DepositCard">
+    <update id="update" parameterType="io.ostenant.rpc.thrift.examples.http.entities.DepositCard">
         update deposit_card
         <set>
             <if test="isVip != null">

@@ -23,7 +23,7 @@ spring:
         max-interval: 2000
   thrift:
     client:
-      package-to-scan: com.icekredit.rpc.thrift.examples.thrift.client
+      package-to-scan: io.ostenant.rpc.thrift.examples.thrift.client
       service-model: hsHa
       pool:
         retry-times: 3

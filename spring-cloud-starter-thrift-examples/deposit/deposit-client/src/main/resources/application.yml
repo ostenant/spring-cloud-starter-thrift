@@ -12,7 +12,7 @@ management:
 spring:
   cloud:
     consul:
-      host: 192.168.127.131
+      host: 127.0.0.1
       port: 8500
       discovery:
         register: false
@@ -23,7 +23,7 @@ spring:
         max-interval: 2000
   thrift:
     client:
-      package-to-scan: com.icekredit.rpc.thrift.examples.thrift.client
+      package-to-scan: io.ostenant.rpc.thrift.examples
       service-model: hsHa
       pool:
         retry-times: 3

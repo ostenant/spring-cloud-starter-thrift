@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.icekredit.rpc.thrift.examples.mapper.BranchMapper">
-    <resultMap id="BaseResultMap" type="com.icekredit.rpc.thrift.examples.http.entities.Branch">
+<mapper namespace="io.ostenant.rpc.thrift.examples.mapper.BranchMapper">
+    <resultMap id="BaseResultMap" type="io.ostenant.rpc.thrift.examples.http.entities.Branch">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="code" jdbcType="VARCHAR" property="code"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
@@ -32,7 +32,7 @@
 
 
     <insert id="save" keyColumn="id" keyProperty="id"
-            parameterType="com.icekredit.rpc.thrift.examples.http.entities.Branch"
+            parameterType="io.ostenant.rpc.thrift.examples.http.entities.Branch"
             useGeneratedKeys="true">
         INSERT INTO branch (id, code, name,
                             address, staffs, bank_id,
@@ -43,7 +43,7 @@
     </insert>
 
 
-    <update id="update" parameterType="com.icekredit.rpc.thrift.examples.http.entities.Branch">
+    <update id="update" parameterType="io.ostenant.rpc.thrift.examples.http.entities.Branch">
         update branch
         <set>
             <if test="code != null">

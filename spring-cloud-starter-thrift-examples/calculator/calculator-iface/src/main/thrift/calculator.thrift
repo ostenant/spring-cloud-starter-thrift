@@ -1,4 +1,4 @@
-namespace java com.icekredit.rpc.thrift.example
+namespace io.ostenant.rpc.thrift.examples
 
 service calculator {
     i32 add(1: i32 arg1, 2: i32 arg2)

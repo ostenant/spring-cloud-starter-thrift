@@ -12,7 +12,7 @@ management:
 spring:
   datasource:
     druid:
-      url: jdbc:mysql://192.168.127.131:3306/deposit?useUnicode=true&characterEncoding=utf-8
+      url: jdbc:mysql://localhost:3306/deposit?useUnicode=true&characterEncoding=utf-8
       driver-class-name: com.mysql.jdbc.Driver
       username: root
       password: root
@@ -29,7 +29,7 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.icekredit.rpc.thrift.examples.http.entities
+  type-aliases-package: io.ostenant.rpc.thrift.examples.http.entities
 
 logging:
   level:

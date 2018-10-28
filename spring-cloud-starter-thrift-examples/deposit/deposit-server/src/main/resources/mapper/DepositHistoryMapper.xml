@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.icekredit.rpc.thrift.examples.mapper.DepositHistoryMapper">
-    <resultMap id="BaseResultMap" type="com.icekredit.rpc.thrift.examples.http.entities.DepositHistory">
+<mapper namespace="io.ostenant.rpc.thrift.examples.mapper.DepositHistoryMapper">
+    <resultMap id="BaseResultMap" type="io.ostenant.rpc.thrift.examples.http.entities.DepositHistory">
         <id column="serial_number" jdbcType="VARCHAR" property="serialNumber"/>
         <result column="transaction_amount" jdbcType="DOUBLE" property="transactionAmount"/>
         <result column="submitted_time" jdbcType="VARCHAR" property="submittedTime"/>
@@ -30,7 +30,7 @@
     </delete>
 
 
-    <insert id="save" parameterType="com.icekredit.rpc.thrift.examples.http.entities.DepositHistory">
+    <insert id="save" parameterType="io.ostenant.rpc.thrift.examples.http.entities.DepositHistory">
         INSERT INTO deposit_history (serial_number, transaction_amount, submitted_time,
                                      finished_time, status, deposit_card_id
         )
@@ -41,7 +41,7 @@
     </insert>
 
 
-    <update id="update" parameterType="com.icekredit.rpc.thrift.examples.http.entities.DepositHistory">
+    <update id="update" parameterType="io.ostenant.rpc.thrift.examples.http.entities.DepositHistory">
         update deposit_history
         <set>
             <if test="transactionAmount != null">

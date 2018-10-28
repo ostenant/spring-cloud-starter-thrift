@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.icekredit.rpc.thrift.client.ThriftClientAutoConfiguration
+io.ostenant.rpc.thrift.client.ThriftClientAutoConfiguration
