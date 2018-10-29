@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFactory<ThriftServerNode, TTransport> {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransportKeyedPooledObjectFactory.class);
 
     private ThriftClientProperties properties;
 
@@ -53,10 +53,11 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
 
         try {
             transport.open();
-            log.info("Open a new transport {}", transport);
+            LOGGER.info("Open a new transport {}", transport);
         } catch (TTransportException e) {
             throw new ThriftClientOpenException("Connect to " + key.getHost() + ":" + key.getPort() + " failed", e);
         }
+
         return transport;
     }
 
@@ -68,20 +69,20 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
     @Override
     public boolean validateObject(ThriftServerNode key, PooledObject<TTransport> value) {
         if (Objects.isNull(value)) {
-            log.warn("PooledObject is already null");
+            LOGGER.warn("PooledObject is already null");
             return false;
         }
 
         TTransport transport = value.getObject();
         if (Objects.isNull(transport)) {
-            log.warn("Pooled transport is already null");
+            LOGGER.warn("Pooled transport is already null");
             return false;
         }
 
         try {
             return transport.isOpen();
         } catch (Exception e) {
-            log.error(e.getCause().getMessage());
+            LOGGER.error(e.getCause().getMessage());
             return false;
         }
     }

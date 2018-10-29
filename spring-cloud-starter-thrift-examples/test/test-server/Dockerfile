@@ -1,4 +1,4 @@
-FROM registry.icekredit.com:443/base/jre8:122
+FROM openjdk:8-jdk-alpine
 ADD target/test-server-1.0-SNAPSHOT.jar test-server.jar
 LABEL SERVICE_8080_NAME=test-server-rest SERVICE_8080_TAGS=http-instance-8080 SERVICE_8080_CHECK_INTERVAL=10s SERVICE_8080_CHECK_TIMEOUT=2s SERVICE_8080_CHECK_HTTP=/health SERVICE_25000_NAME=test-server-rpc SERVICE_25000_TAGS=tcp-instance-25000 SERVICE_25000_CHECK_INTERVAL=10s SERVICE_25000_CHECK_TIMEOUT=2s SERVICE_25000_CHECK_TCP=/
 ENTRYPOINT ["java", "-jar", "test-server.jar"]

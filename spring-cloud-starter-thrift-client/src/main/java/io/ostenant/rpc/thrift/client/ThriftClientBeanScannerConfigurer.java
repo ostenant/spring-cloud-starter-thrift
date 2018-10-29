@@ -17,13 +17,13 @@ import java.util.*;
 
 public class ThriftClientBeanScannerConfigurer implements ApplicationContextAware, BeanFactoryPostProcessor {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
-
-    private ApplicationContext applicationContext;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientBeanScannerConfigurer.class);
 
     private static final String SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN = "spring.thrift.client.package-to-scan";
 
-    private final static String DEFAULT_SCAN_PACKAGE = "";
+    private static final String DEFAULT_SCAN_PACKAGE = "";
+
+    private ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -52,17 +52,18 @@ public class ThriftClientBeanScannerConfigurer implements ApplicationContextAwar
         if (delimiterIndex > -1) {
             StringTokenizer tokenizer = new StringTokenizer(basePackages, ",");
             Set<String> packageToScanSet = new HashSet<>();
+
             while (tokenizer.hasMoreTokens()) {
                 String subPackage = tokenizer.nextToken();
                 packageToScanSet.add(subPackage);
-                log.info("Subpackage {} is to be scanned by {}", subPackage, beanScanner);
+                LOGGER.info("Subpackage {} is to be scanned by {}", subPackage, beanScanner);
             }
 
             List<String> packageToScanList = new ArrayList<>(packageToScanSet);
             String[] packagesToScan = packageToScanList.toArray(new String[packageToScanList.size()]);
             beanScanner.scan(packagesToScan);
         } else {
-            log.info("Base package {} is to be scanned with {}", basePackages, beanScanner);
+            LOGGER.info("Base package {} is to be scanned by {}", basePackages, beanScanner);
             beanScanner.scan(basePackages);
         }
     }

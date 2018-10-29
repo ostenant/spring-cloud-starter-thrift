@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 public class TRegisterProcessorFactory {
 
-    private final static Logger log = LoggerFactory.getLogger(TRegisterProcessorFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TRegisterProcessorFactory.class);
 
     private static class TRegisterProcessorHolder {
         private static final TRegisterProcessor REGISTER_PROCESSOR = new TRegisterProcessor();
@@ -34,11 +34,9 @@ public class TRegisterProcessorFactory {
         }
 
         TRegisterProcessor registerProcessor = getRegisterProcessor();
-
         registerProcessor.setProcessorMap(new HashMap<>(serviceWrappers.size()));
-
         register(serviceWrappers, registerProcessor);
-        log.info("Multiplexed processor totally owns {} service processors", registerProcessor.processorMetaMap.size());
+        LOGGER.info("Multiplexed processor totally owns {} service processors", registerProcessor.processorMetaMap.size());
 
         return registerProcessor;
     }
@@ -69,10 +67,9 @@ public class TRegisterProcessorFactory {
             String serviceSignature = serviceWrapper.getThriftServiceSignature();
 
             registerProcessor.processorMetaMap.putIfAbsent(serviceSignature, serviceWrapper);
-            log.info("Processor bean {} with signature [{}] is instantiated", singleProcessor, serviceSignature);
-
+            LOGGER.info("Processor bean {} with signature [{}] is instantiated", singleProcessor, serviceSignature);
             registerProcessor.registerProcessor(serviceSignature, singleProcessor);
-            log.info("Single processor {} register onto multiplexed processor with signature [{}]", singleProcessor, serviceSignature);
+            LOGGER.info("Single processor {} register onto multiplexed processor with signature [{}]", singleProcessor, serviceSignature);
         }
     }
 

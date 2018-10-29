@@ -10,11 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThriftServerBootstrap implements SmartLifecycle {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftServerBootstrap.class);
 
     private ThriftServerGroup thriftServerGroup;
 
-    ThriftServerBootstrap(ThriftServerGroup thriftServerGroup) {
+    public ThriftServerBootstrap(ThriftServerGroup thriftServerGroup) {
         this.thriftServerGroup = thriftServerGroup;
     }
 
@@ -26,14 +26,12 @@ public class ThriftServerBootstrap implements SmartLifecycle {
     @Override
     public void stop(Runnable runnable) {
         if (isRunning()) {
-            log.info("Shutting down thrift servers");
+            LOGGER.info("Shutting down thrift servers");
             thriftServerGroup.getServers().forEach(server -> {
                 server.setShouldStop(true);
                 server.stop();
             });
-            if (runnable != null) {
-                runnable.run();
-            }
+            runnable.run();
         }
     }
 
@@ -42,7 +40,9 @@ public class ThriftServerBootstrap implements SmartLifecycle {
         if (CollectionUtils.isEmpty(thriftServerGroup.getServers())) {
             return;
         }
-        log.info("Starting thrift servers");
+
+        LOGGER.info("Starting thrift servers");
+
         AtomicInteger serverIndex = new AtomicInteger(0);
         thriftServerGroup.getServers().forEach(server -> {
             ThriftRunner runner = new ThriftRunner(server);
@@ -68,11 +68,12 @@ public class ThriftServerBootstrap implements SmartLifecycle {
 
     private static class ThriftRunner implements Runnable {
 
+        private static final Logger LOGGER = LoggerFactory.getLogger(ThriftRunner.class);
+
         private TServer server;
 
-        private Logger log = LoggerFactory.getLogger(getClass());
 
-        ThriftRunner(TServer server) {
+        public ThriftRunner(TServer server) {
             this.server = server;
         }
 
@@ -80,7 +81,7 @@ public class ThriftServerBootstrap implements SmartLifecycle {
         public void run() {
             if (server != null) {
                 this.server.serve();
-                log.info(server.isServing() ? "Thrift server started successfully" : "Thrift server failed to start");
+                LOGGER.info(server.isServing() ? "Thrift server started successfully" : "Thrift server failed to start");
             }
         }
     }

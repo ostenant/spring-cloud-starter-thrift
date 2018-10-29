@@ -73,24 +73,6 @@ public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsu
         return serverNodeList;
     }
 
-    private void filterAndCompoServerNodes(List<ThriftConsulServerNode> serverNodeList, List<ServiceHealth> serviceHealthList) {
-        for (ServiceHealth serviceHealth : serviceHealthList) {
-            ThriftConsulServerNode serverNode = getThriftConsulServerNode(serviceHealth);
-            if (serverNode == null) {
-                continue;
-            }
-
-            if (!serverNode.isHealth()) {
-                continue;
-            }
-
-            if (CollectionUtils.isEmpty(serverNode.getTags())) {
-                continue;
-            }
-            serverNodeList.add(serverNode);
-        }
-    }
-
     @Override
     public Map<String, LinkedHashSet<ThriftConsulServerNode>> getThriftServers() {
         if (MapUtils.isNotEmpty(this.serverNodeMap)) {
@@ -148,6 +130,25 @@ public class ThriftConsulServerNodeList extends ThriftServerNodeList<ThriftConsu
         serverNode.setHealth(ThriftConsulServerUtils.isPassingCheck(serviceHealth));
 
         return serverNode;
+    }
+
+
+    private void filterAndCompoServerNodes(List<ThriftConsulServerNode> serverNodeList, List<ServiceHealth> serviceHealthList) {
+        for (ServiceHealth serviceHealth : serviceHealthList) {
+            ThriftConsulServerNode serverNode = getThriftConsulServerNode(serviceHealth);
+            if (serverNode == null) {
+                continue;
+            }
+
+            if (!serverNode.isHealth()) {
+                continue;
+            }
+
+            if (CollectionUtils.isEmpty(serverNode.getTags())) {
+                continue;
+            }
+            serverNodeList.add(serverNode);
+        }
     }
 
     private static class ThriftConsulResponseCallback implements ConsulResponseCallback<List<ServiceHealth>> {

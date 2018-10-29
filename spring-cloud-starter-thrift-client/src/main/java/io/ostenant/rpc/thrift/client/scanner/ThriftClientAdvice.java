@@ -37,7 +37,7 @@ import java.util.Objects;
 
 public class ThriftClientAdvice implements MethodInterceptor {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientAdvice.class);
 
     private ThriftServiceSignature serviceSignature;
 
@@ -100,7 +100,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
 
         while (true) {
             if (retryTimes++ > poolProperties.getRetryTimes()) {
-                log.error(
+                LOGGER.error(
                         "All thrift client call failed, method is {}, args is {}, retryTimes: {}",
                         invocation.getMethod().getName(), args, retryTimes);
                 throw new ThriftClientException("Thrift client call failed, thrift client signature is: " + serviceSignature.marker());
@@ -136,7 +136,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
                             transport.close();
                         }
 
-                        log.error("Thrift client request timeout, ip is {}, port is {}, timeout is {}, method is {}, args is {}",
+                        LOGGER.error("Thrift client request timeout, ip is {}, port is {}, timeout is {}, method is {}, args is {}",
                                 serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout(),
                                 invocation.getMethod(), args);
                         throw new ThriftClientRequestTimeoutException("Thrift client request timeout", e);
@@ -155,9 +155,8 @@ public class ThriftClientAdvice implements MethodInterceptor {
                         }
                     }
 
-
                 } else if (undeclaredThrowable instanceof TApplicationException) {  // 有可能服务端返回的结果里存在null
-                    log.error(
+                    LOGGER.error(
                             "Thrift end of file, ip is {}, port is {}, timeout is {}, method is {}, args is {}, retryTimes is {}",
                             serverNode.getHost(), serverNode.getPort(), serverNode.getTimeout(),
                             invocation.getMethod(), args, retryTimes);
@@ -193,7 +192,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
                         objectPool.returnObject(serverNode, transport);
                     }
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         }

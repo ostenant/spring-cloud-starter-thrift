@@ -4,8 +4,8 @@ import com.orbitz.consul.model.health.HealthCheck;
 import com.orbitz.consul.model.health.Node;
 import com.orbitz.consul.model.health.Service;
 import com.orbitz.consul.model.health.ServiceHealth;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.net.Inet6Address;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class ThriftConsulServerUtils {
 
-    private static final Log log = LogFactory.getLog(ThriftConsulServerUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftConsulServerUtils.class);
 
     private static final String CHECK_STATUS_PASSING = "passing";
 
@@ -40,7 +40,7 @@ public class ThriftConsulServerUtils {
             InetAddress inetAddress = InetAddress.getByName(address);
             return inetAddress instanceof Inet6Address ? "[" + inetAddress.getHostName() + "]" : address;
         } catch (UnknownHostException var2) {
-            log.debug("Not InetAddress: " + address + " , resolved as is.");
+            LOGGER.error("Not InetAddress: " + address + " , resolved as is.");
             return address;
         }
     }

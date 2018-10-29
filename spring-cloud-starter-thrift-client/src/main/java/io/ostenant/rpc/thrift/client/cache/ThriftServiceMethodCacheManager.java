@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class ThriftServiceMethodCacheManager {
 
-    private final static Map<String, ThriftServiceMethodCache> methodCachedMap = Maps.newConcurrentMap();
+    private static final Map<String, ThriftServiceMethodCache> methodCachedMap = Maps.newConcurrentMap();
 
     private ThriftServiceMethodCacheManager() {
     }
@@ -24,12 +24,13 @@ public class ThriftServiceMethodCacheManager {
     }
 
     public static ThriftServiceMethodCache putIfAbsent(Class<?> targetClass) {
-        ThriftServiceMethodCache methodCache = methodCachedMap.get(targetClass.getName());
+        String targetClassName = targetClass.getName();
+        ThriftServiceMethodCache methodCache = methodCachedMap.get(targetClassName);
         if (methodCache == null) {
             methodCache = new ThriftServiceMethodCache(targetClass);
-            ThriftServiceMethodCache tmp = methodCachedMap.putIfAbsent(targetClass.getName(), methodCache);
-            if(!Objects.isNull(tmp)){
-            	methodCache = tmp;
+            ThriftServiceMethodCache updateMethodCache = methodCachedMap.putIfAbsent(targetClassName, methodCache);
+            if (Objects.nonNull(updateMethodCache)) {
+                methodCache = updateMethodCache;
             }
         }
         return methodCache;

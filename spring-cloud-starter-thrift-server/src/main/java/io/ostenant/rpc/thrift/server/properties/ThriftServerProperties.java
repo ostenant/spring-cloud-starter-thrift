@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ThriftServerProperties {
 
     /**
-     * 服务名称/ID
+     * 服务名称ID
      */
     private String serviceId;
 
@@ -16,12 +16,17 @@ public class ThriftServerProperties {
     private int port = 25000;
 
     /**
+     * 服务注册信息（默认不开启）
+     */
+    private ThriftServerDiscoveryProperties discovery;
+
+    /**
      * 服务的工作线程队列容量
      */
     private int workerQueueCapacity = 1000;
 
     /**
-     * 服务模型(单线程/多线程/阻塞/非阻塞)
+     * 服务模型(单线程/多线程/阻塞/非阻塞) 默认hsHa
      * <p>
      * simple: 单线程阻塞模型
      * nonBlocking: 单线程非阻塞模型
@@ -52,6 +57,14 @@ public class ThriftServerProperties {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public ThriftServerDiscoveryProperties getDiscovery() {
+        return discovery;
+    }
+
+    public void setDiscovery(ThriftServerDiscoveryProperties discovery) {
+        this.discovery = discovery;
     }
 
     public int getWorkerQueueCapacity() {

@@ -12,13 +12,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ThriftConsulServerListUpdater implements ServerListUpdater {
 
-    private static final Logger logger = LoggerFactory.getLogger(ThriftConsulServerListUpdater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftConsulServerListUpdater.class);
 
     private final AtomicBoolean isActive = new AtomicBoolean(false);
-    private volatile ScheduledFuture<?> scheduledFuture;
-
     private final long initialDelayMs;
     private final long refreshIntervalMs;
+    private volatile ScheduledFuture<?> scheduledFuture;
 
     public ThriftConsulServerListUpdater() {
         this(30000);
@@ -34,10 +33,10 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
     }
 
     private static class LazyHolder {
-        private final static int CORE_THREAD = 2;
-        private static Thread _shutdownThread;
+        private static final int CORE_THREAD = 2;
+        private static Thread shutdownThread;
 
-        static ScheduledThreadPoolExecutor _serverListRefreshExecutor = null;
+        static ScheduledThreadPoolExecutor serverListRefreshExecutor = null;
 
         static {
             ThreadFactory factory = new ThreadFactoryBuilder()
@@ -45,25 +44,25 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
                     .setDaemon(true)
                     .build();
 
-            _serverListRefreshExecutor = new ScheduledThreadPoolExecutor(CORE_THREAD, factory);
+            serverListRefreshExecutor = new ScheduledThreadPoolExecutor(CORE_THREAD, factory);
 
-            _shutdownThread = new Thread(() -> {
-                logger.info("Shutting down the Executor Pool for ThriftConsulServerListUpdater");
+            shutdownThread = new Thread(() -> {
+                LOGGER.info("Shutting down the Executor Pool for ThriftConsulServerListUpdater");
                 shutdownExecutorPool();
             });
 
-            Runtime.getRuntime().addShutdownHook(_shutdownThread);
+            Runtime.getRuntime().addShutdownHook(shutdownThread);
         }
 
         private static void shutdownExecutorPool() {
-            if (_serverListRefreshExecutor != null) {
-                _serverListRefreshExecutor.shutdown();
+            if (serverListRefreshExecutor != null) {
+                serverListRefreshExecutor.shutdown();
 
-                if (_shutdownThread != null) {
+                if (shutdownThread != null) {
                     try {
-                        Runtime.getRuntime().removeShutdownHook(_shutdownThread);
+                        Runtime.getRuntime().removeShutdownHook(shutdownThread);
                     } catch (IllegalStateException e) {
-                        logger.error("Failed to shutdown the Executor Pool for ThriftConsulServerListUpdater", e);
+                        LOGGER.error("Failed to shutdown the Executor Pool for ThriftConsulServerListUpdater", e);
                     }
                 }
 
@@ -72,7 +71,7 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
     }
 
     private static ScheduledThreadPoolExecutor getRefreshExecutor() {
-        return LazyHolder._serverListRefreshExecutor;
+        return LazyHolder.serverListRefreshExecutor;
     }
 
     @Override
@@ -89,7 +88,7 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
                 try {
                     updateAction.doUpdate();
                 } catch (Exception e) {
-                    logger.warn("Failed one do update action", e);
+                    LOGGER.warn("Failed one do update action", e);
                 }
 
             };
@@ -101,7 +100,7 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
                     TimeUnit.MILLISECONDS
             );
         } else {
-            logger.info("Already active, no other operation");
+            LOGGER.info("Already active, no other operation");
         }
     }
 
@@ -112,7 +111,7 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
                 scheduledFuture.cancel(true);
             }
         } else {
-            logger.info("Not active, no other operation");
+            LOGGER.info("Not active, no other operation");
         }
     }
 }

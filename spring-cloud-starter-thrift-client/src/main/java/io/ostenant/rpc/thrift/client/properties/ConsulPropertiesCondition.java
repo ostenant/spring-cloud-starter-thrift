@@ -24,8 +24,7 @@ public class ConsulPropertiesCondition extends SpringBootCondition {
 
         ThriftClientContext.registry(consulAddress);
 
-        return new ConditionOutcome(StringUtils.isNotBlank(host)
-                && port > 0,
+        return new ConditionOutcome(StringUtils.isNotBlank(host) && port > 0,
                 "Consul server address is " + consulAddress);
     }
 }

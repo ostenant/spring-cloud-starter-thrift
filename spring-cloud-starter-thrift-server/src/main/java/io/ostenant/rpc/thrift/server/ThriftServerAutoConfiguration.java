@@ -26,15 +26,14 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Configuration
-@ConditionalOnProperty(value = "spring.thrift.server.service-id",matchIfMissing = false)
+@ConditionalOnProperty(value = "spring.thrift.server.service-id", matchIfMissing = false)
 @EnableConfigurationProperties(ThriftServerProperties.class)
 public class ThriftServerAutoConfiguration implements ApplicationContextAware {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftServerAutoConfiguration.class);
 
     private ApplicationContext applicationContext;
 
@@ -47,8 +46,8 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
     @ConditionalOnMissingBean
     public ThriftServerGroup thriftServerGroup(ThriftServerProperties properties) throws TTransportException, IOException {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(ThriftService.class);
-        if (Objects.isNull(beanNames) || beanNames.length == 0) {
-            log.error("Can not found any thrift service annotated with @ThriftService");
+        if (beanNames.length == 0) {
+            LOGGER.error("Can't search any thrift service annotated with @ThriftService");
             throw new ThriftServerException("Can not found any thrift service");
         }
 
@@ -59,11 +58,11 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
             ThriftService thriftService = bean.getClass().getAnnotation(ThriftService.class);
             String thriftServiceName = StringUtils.isEmpty(thriftService.value()) ? beanName : thriftService.value();
 
-            if(target instanceof Advised) {
+            if (target instanceof Advised) {
                 final Object targetBean = target;
                 TargetSource targetSource = ((Advised) target).getTargetSource();
-                if (log.isDebugEnabled()) {
-                    log.debug("Target object {} uses cglib proxy");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Target object {} uses cglib proxy");
                 }
 
                 try {

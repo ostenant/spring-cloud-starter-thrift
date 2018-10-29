@@ -19,7 +19,6 @@ public class ThriftClientPropertiesCondition extends SpringBootCondition {
 
         return new ConditionOutcome(StringUtils.isNotBlank(packageToScan)
                 , "Thrift server service model is " + serviceModel);
-
     }
 
 }
