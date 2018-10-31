@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 endpoints:
   actuator:
     sensitive: false
@@ -8,15 +5,7 @@ endpoints:
 management:
   security:
     enabled: false
-
 spring:
-  thrift:
-    server:
-      service-id: thrift-rpc-calculator
-      service-model: hsHa
-      port: 25000
-      worker-queue-capacity: 1000
-      hs-ha:
-        min-worker-threads: 5
-        max-worker-threads: 20
-        keep-alived-time: 3
+  profiles:
+    active: 25000
+

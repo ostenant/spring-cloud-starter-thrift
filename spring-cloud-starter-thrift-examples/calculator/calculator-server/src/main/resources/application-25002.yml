@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  thrift:
+    server:
+      service-id: thrift-calculator-rpc-server
+      service-model: threadedSelector
+      port: 25002
+      worker-queue-capacity: 1000
+      threaded-selector:
+        accept-queue-size-per-thread: 4
+        selector-threads: 2
+        min-worker-threads: 5
+        max-worker-threads: 10
+        keep-alived-time: 5
+      discovery:
+        enabled: true
+        host: 127.0.0.1
+        port: 8500
+        tags:
+          - threadedSelector
+          - calculator-25002
+        health-check:
+          enabled: true
+          check-interval: 10
+          check-timeout: 3
+
+

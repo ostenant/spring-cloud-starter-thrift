@@ -49,7 +49,7 @@ public class ThriftConsulServerListLoadBalancer extends AbstractLoadBalancer {
                 return null;
             }
 
-            if (serverNode != null && serverNode instanceof ThriftConsulServerNode) {
+            if (serverNode instanceof ThriftConsulServerNode) {
                 return (ThriftConsulServerNode) serverNode;
             }
         }

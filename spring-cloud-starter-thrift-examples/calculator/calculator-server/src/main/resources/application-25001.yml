@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+spring:
+  thrift:
+    server:
+      service-id: thrift-calculator-rpc-server
+      service-model: threadPool
+      port: 25001
+      worker-queue-capacity: 1000
+      thread-pool:
+        min-worker-threads: 5
+        max-worker-threads: 10
+        request-timeout: 5
+        keep-alived-time: 2
+      discovery:
+        enabled: true
+        host: 127.0.0.1
+        port: 8500
+        tags:
+          - threadPool
+          - calculator-25001
+        health-check:
+          enabled: true
+          check-interval: 10
+          check-timeout: 3
+
+

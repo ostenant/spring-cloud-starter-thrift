@@ -55,12 +55,12 @@ public class TThreadPoolServerArgument extends TThreadPoolServer.Args {
     }
 
     private ExecutorService createInvokerPool(ThriftServerProperties properties) {
-        TThreadedSelectorServerProperties threadedSelectorProperties = properties.getThreadedSelector();
+        TThreadPoolServerProperties threadPoolProperties = properties.getThreadPool();
 
         return new ThreadPoolExecutor(
-                threadedSelectorProperties.getMinWorkerThreads(),
-                threadedSelectorProperties.getMaxWorkerThreads(),
-                threadedSelectorProperties.getKeepAlivedTime(), TimeUnit.MINUTES,
+                threadPoolProperties.getMinWorkerThreads(),
+                threadPoolProperties.getMaxWorkerThreads(),
+                threadPoolProperties.getKeepAlivedTime(), TimeUnit.MINUTES,
                 new LinkedBlockingQueue<>(properties.getWorkerQueueCapacity()));
     }
 

@@ -16,7 +16,7 @@ public class THsHaServerProperties {
     private int maxWorkerThreads = 20;
 
     /**
-     * 线程的存活时间
+     * 线程的存活时间 (min)
      */
     private int keepAlivedTime = 1;
 

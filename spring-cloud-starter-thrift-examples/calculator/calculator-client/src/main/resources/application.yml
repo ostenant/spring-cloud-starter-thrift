@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8088
 
 endpoints:
   actuator:
@@ -17,8 +17,8 @@ spring:
       host: 127.0.0.1
       port: 8500
       discovery:
-        register: false
-        register-health-check: true
+        register: true
+        register-health-check: false
         health-check-interval: 30s
       retry:
         max-attempts: 3

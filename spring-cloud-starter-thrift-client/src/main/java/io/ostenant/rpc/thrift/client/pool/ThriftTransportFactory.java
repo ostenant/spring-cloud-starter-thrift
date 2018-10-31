@@ -18,10 +18,9 @@ public class ThriftTransportFactory {
     private static final int CONNECT_TIMEOUT = 10;
 
     public static TTransport determineTTranport(String serviceModel, ThriftServerNode serverNode, int connectTimeout) {
-        String serviceModelAlias = StringUtils.upperCase(serviceModel);
         TTransport transport;
 
-        switch (serviceModelAlias) {
+        switch (serviceModel) {
             case TServiceModel.SERVICE_MODEL_SIMPLE:
             case TServiceModel.SERVICE_MODEL_THREAD_POOL:
                 transport = createTSocket(serviceModel, serverNode, connectTimeout);

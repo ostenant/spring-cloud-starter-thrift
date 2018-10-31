@@ -8,14 +8,14 @@ import java.util.Map;
 
 public interface ILoadBalancer<T extends ThriftServerNode> {
 
-    public T chooseServerNode(String key);
+    T chooseServerNode(String key);
 
-    public Map<String, LinkedHashSet<T>> getAllServerNodes();
+    Map<String, LinkedHashSet<T>> getAllServerNodes();
 
-    public Map<String, LinkedHashSet<T>> getRefreshedServerNodes();
+    Map<String, LinkedHashSet<T>> getRefreshedServerNodes();
 
-    public List<T> getServerNodes(String key);
+    List<T> getServerNodes(String key);
 
-    public List<T> getRefreshedServerNodes(String key);
+    List<T> getRefreshedServerNodes(String key);
 
 }

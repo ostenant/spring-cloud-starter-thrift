@@ -2,7 +2,7 @@ package io.ostenant.rpc.thrift.server.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "spring.thrift.server.health-check")
+@ConfigurationProperties(prefix = "spring.thrift.server.discovery.health-check")
 public class ThriftServerHealthCheckProperties {
 
     /**
@@ -13,7 +13,7 @@ public class ThriftServerHealthCheckProperties {
     /**
      * 服务健康检查路径
      */
-    private String checkTcp = "/";
+    private String checkTcp = "";
 
     /**
      * 服务健康检查时间间隔

@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  thrift:
+    server:
+      service-id: thrift-calculator-rpc-server
+      service-model: hsHa
+      port: 25000
+      worker-queue-capacity: 1000
+      hs-ha:
+        min-worker-threads: 5
+        max-worker-threads: 20
+        keep-alived-time: 5
+      discovery:
+        enabled: true
+        host: 127.0.0.1
+        port: 8500
+        tags:
+          - hsHa
+          - calculator-25000
+        health-check:
+          enabled: true
+          check-interval: 10
+          check-timeout: 3
+
+

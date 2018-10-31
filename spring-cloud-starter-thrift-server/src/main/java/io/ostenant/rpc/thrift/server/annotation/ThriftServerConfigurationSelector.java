@@ -1,6 +1,7 @@
 package io.ostenant.rpc.thrift.server.annotation;
 
 import io.ostenant.rpc.thrift.server.ThriftServerAutoConfiguration;
+import io.ostenant.rpc.thrift.server.ThriftServerDiscoveryConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ImportSelector;
@@ -12,9 +13,10 @@ public class ThriftServerConfigurationSelector implements ImportSelector {
 
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        String importClassName = ThriftServerAutoConfiguration.class.getName();
-        LOGGER.info("Auto import configuration class {}", importClassName);
+        String autoClassName = ThriftServerAutoConfiguration.class.getName();
+        String discoveryClassName = ThriftServerDiscoveryConfiguration.class.getName();
+        LOGGER.info("Auto import configuration class {}, {}", autoClassName, discoveryClassName);
 
-        return new String[]{importClassName};
+        return new String[]{autoClassName, discoveryClassName};
     }
 }

@@ -12,6 +12,7 @@ public class RpcCalculatorService implements CalculatorService.Iface {
     public int add(int arg1, int arg2) {
         BigDecimal arg1Decimal = new BigDecimal(arg1);
         BigDecimal arg2Decimal = new BigDecimal(arg2);
+        System.out.println(System.currentTimeMillis());
         return arg1Decimal.add(arg2Decimal).intValue();
     }
 
