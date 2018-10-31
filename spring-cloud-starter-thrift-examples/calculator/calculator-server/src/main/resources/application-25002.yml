@@ -25,5 +25,3 @@ spring:
           enabled: true
           check-interval: 10
           check-timeout: 3
-
-
