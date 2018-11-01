@@ -28,7 +28,7 @@
 calculator.thrift
 
 ```thrift
-namespace java com.icekredit.rpc.thrift.example
+namespace java io.ostenant.rpc.thrift.examples
 
 service CalculatorService {
     i32 add(1: i32 arg1, 2: i32 arg2)
@@ -133,9 +133,9 @@ public class CalculatorService {
 
 ```xml
     <dependency>
-        <groupId>com.icekredit.rpc.thrift</groupId>
+        <groupId>io.ostenant.rpc.thrift</groupId>
         <artifactId>spring-cloud-starter-thrift-server</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </dependency>
 ```
 
@@ -147,9 +147,9 @@ pom.xml
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>com.icekredit.rpc.thrift</groupId>
+        <groupId>io.ostenant.rpc.thrift</groupId>
         <artifactId>spring-cloud-starter-thrift-example</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -158,14 +158,14 @@ pom.xml
 
     <dependencies>
         <dependency>
-            <groupId>com.icekredit.rpc.thrift</groupId>
+            <groupId>io.ostenant.rpc.thrift</groupId>
             <artifactId>spring-boot-starter-thrift-server</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.icekredit.rpc.thrift</groupId>
+            <groupId>io.ostenant.rpc.thrift</groupId>
             <artifactId>spring-cloud-starter-thrift-example-iface</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
@@ -277,13 +277,13 @@ public class RpcCalculatorService implements CalculatorService.Iface {
 
 ```dockerfile
 FROM openjdk:8-jdk-alpine
-ADD target/spring-boot-thrift-server-0.0.1-SNAPSHOT.jar calculator-server.jar
+ADD target/spring-boot-thrift-server-1.0.0jar calculator-server.jar
 ENTRYPOINT ["java", "-jar", "calculator-server.jar"]
 ```
 
 将`Dockerfile`和`target/spring-boot-thrift-server-0.0.1-SNAPSHOT.jar`拷贝到服务器上，构建`Thrift Server`的服务镜像：
 ```docker
-docker build . -t icekredit/calculator-server
+docker build . -t ostenant/calculator-server
 ```
 
 启动三个`Thrift Server`的`docker`容器，分别指定对应的端口号和`Consul`注册信息：
@@ -297,7 +297,7 @@ docker run -d -p 8081:8080 -p 25001:25000 --name calculator-server-01 \
 	-e "SERVICE_25000_CHECK_INTERVAL=30s" \
 	-e "SERVICE_25000_CHECK_TIMEOUT=3s" \
 	-e "SERVICE_25000_TAGS=thrift-rpc-calculator-25001" \
-	 icekredit/calculator-server
+	 ostenant/calculator-server
 ```
 
 `Thrift Server`实例2(25002端口)：
@@ -309,7 +309,7 @@ docker run -d -p 8081:8080 -p 25002:25000 --name calculator-server-01 \
 	-e "SERVICE_25000_CHECK_INTERVAL=30s" \
 	-e "SERVICE_25000_CHECK_TIMEOUT=3s" \
 	-e "SERVICE_25000_TAGS=thrift-rpc-calculator-25002" \
-	 icekredit/calculator-server
+	 ostenant/calculator-server
 ```
 
 `Thrift Server`实例3(25003端口)：
@@ -321,7 +321,7 @@ docker run -d -p 8081:8080 -p 25003:25000 --name calculator-server-01 \
 	-e "SERVICE_25000_CHECK_INTERVAL=30s" \
 	-e "SERVICE_25000_CHECK_TIMEOUT=3s" \
 	-e "SERVICE_25000_TAGS=thrift-rpc-calculator-25003" \
-	 icekredit/calculator-server
+	 ostenant/calculator-server
 ```
 
 启动`Consul`和`Registrator`容器，`Thrift Server`的三个服务实例成功注册到Consul服务列表：
@@ -347,9 +347,9 @@ docker run -d -p 8081:8080 -p 25003:25000 --name calculator-server-01 \
 
 ```xml
     <dependency>
-        <groupId>com.icekredit.rpc.thrift</groupId>
+        <groupId>io.ostenant.rpc.thrift</groupId>
         <artifactId>spring-cloud-starter-thrift-client</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </dependency>
 ```
 
@@ -361,9 +361,9 @@ pom.xml
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>com.icekredit.rpc.thrift</groupId>
+        <groupId>io.ostenant.rpc.thrift</groupId>
         <artifactId>spring-cloud-starter-thrift-example</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -371,14 +371,14 @@ pom.xml
 
     <dependencies>
         <dependency>
-            <groupId>com.icekredit.rpc.thrift</groupId>
+            <groupId>io.ostenant.rpc.thrift</groupId>
             <artifactId>spring-cloud-starter-thrift-client</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.icekredit.rpc.thrift</groupId>
+            <groupId>io.ostenant.rpc.thrift</groupId>
             <artifactId>spring-cloud-starter-thrift-example-iface</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
@@ -441,7 +441,7 @@ management:
 spring:
   cloud:
     consul:
-      host: 192.168.91.128 ## Consul的IP地址
+      host: 127.0.0.1 ## Consul的IP地址
       port: 8500 ## Consul的端口号
       discovery:
         register: false ## 是否将自身注册为服务
@@ -452,7 +452,7 @@ spring:
         max-interval: 2000
   thrift:
     client:
-      package-to-scan: com.icekredit.rpc.thrift.example.rpc ## 标记由有注解@ThriftClient接口的包路径
+      package-to-scan: io.ostenant.rpc.thrift.example.rpc ## 标记由有注解@ThriftClient接口的包路径
       service-model: hsHa ## 服务线程模型（这里必须与服务端保持一致, 默认都是hsHa）
       pool: ## 客户端连接池配置
         retry-times: 3 
@@ -530,7 +530,6 @@ public class RpcCalculatorController {
     public int division(@RequestParam("arg1") int arg1, @RequestParam("arg2") int arg2) throws Exception {
         return calculators.thriftClient().division(arg1, arg2);
     }
-
 }
 
 ```

@@ -7,6 +7,7 @@ import io.ostenant.rpc.thrift.client.properties.ConsulPropertiesCondition;
 import io.ostenant.rpc.thrift.client.properties.ThriftClientPoolProperties;
 import io.ostenant.rpc.thrift.client.properties.ThriftClientProperties;
 import io.ostenant.rpc.thrift.client.properties.ThriftClientPropertiesCondition;
+import io.ostenant.rpc.thrift.client.scanner.ThriftClientBeanScanProcessor;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,8 +24,8 @@ public class ThriftClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ThriftClientBeanScannerConfigurer thriftClientBeanScannerConfigurer() {
-        return new ThriftClientBeanScannerConfigurer();
+    public ThriftClientBeanScanProcessor thriftClientBeanScannerConfigurer() {
+        return new ThriftClientBeanScanProcessor();
     }
 
     @Bean

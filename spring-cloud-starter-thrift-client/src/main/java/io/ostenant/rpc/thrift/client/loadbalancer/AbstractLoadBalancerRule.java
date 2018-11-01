@@ -13,5 +13,4 @@ public abstract class AbstractLoadBalancerRule implements IRule {
     public ILoadBalancer getLoadBalancer() {
         return lb;
     }
-
 }

@@ -71,17 +71,10 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
                     throw new ThriftServerInstantiateException("Failed to get target bean from " + target, e);
                 }
 
-                return ThriftServiceWrapperFactory.wrapper(
-                        properties.getServiceId(),
-                        thriftServiceName, targetBean,
-                        thriftService.version());
+                return ThriftServiceWrapperFactory.wrapper(properties.getServiceId(), thriftServiceName, targetBean, thriftService.version());
             }
 
-            return ThriftServiceWrapperFactory.wrapper(
-                    properties.getServiceId(),
-                    thriftServiceName, target,
-                    thriftService.version());
-
+            return ThriftServiceWrapperFactory.wrapper(properties.getServiceId(), thriftServiceName, target, thriftService.version());
         }).collect(Collectors.toList());
 
         AbstractThriftServerContext serverContext = new ThriftServerContext(properties, serviceWrappers);
@@ -93,5 +86,4 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
     public ThriftServerBootstrap thriftServerBootstrap(ThriftServerGroup thriftServerGroup) {
         return new ThriftServerBootstrap(thriftServerGroup);
     }
-
 }

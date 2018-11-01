@@ -1,6 +1,5 @@
-package io.ostenant.rpc.thrift.client;
+package io.ostenant.rpc.thrift.client.scanner;
 
-import io.ostenant.rpc.thrift.client.scanner.ThriftClientBeanScanner;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +14,9 @@ import org.springframework.context.annotation.ScopedProxyMode;
 
 import java.util.*;
 
-public class ThriftClientBeanScannerConfigurer implements ApplicationContextAware, BeanFactoryPostProcessor {
+public class ThriftClientBeanScanProcessor implements ApplicationContextAware, BeanFactoryPostProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientBeanScannerConfigurer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientBeanScanProcessor.class);
 
     private static final String SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN = "spring.thrift.client.package-to-scan";
 
@@ -33,12 +32,10 @@ public class ThriftClientBeanScannerConfigurer implements ApplicationContextAwar
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         BeanDefinitionRegistry definitionRegistry = (BeanDefinitionRegistry) beanFactory;
-
         ThriftClientBeanScanner beanScanner = new ThriftClientBeanScanner(definitionRegistry);
         beanScanner.setResourceLoader(applicationContext);
         beanScanner.setBeanNameGenerator(new AnnotationBeanNameGenerator());
         beanScanner.setScopedProxyMode(ScopedProxyMode.INTERFACES);
-
         setScannedPackages(beanScanner, applicationContext.getEnvironment().getProperty(SPRING_THRIFT_CLIENT_PACKAGE_TO_SCAN));
     }
 
@@ -52,13 +49,13 @@ public class ThriftClientBeanScannerConfigurer implements ApplicationContextAwar
         if (delimiterIndex > -1) {
             StringTokenizer tokenizer = new StringTokenizer(basePackages, ",");
             Set<String> packageToScanSet = new HashSet<>();
-
-            while (tokenizer.hasMoreTokens()) {
-                String subPackage = tokenizer.nextToken();
-                packageToScanSet.add(subPackage);
-                LOGGER.info("Subpackage {} is to be scanned by {}", subPackage, beanScanner);
+            if (tokenizer.hasMoreTokens()) {
+                do {
+                    String subPackage = tokenizer.nextToken();
+                    packageToScanSet.add(subPackage);
+                    LOGGER.info("Subpackage {} is to be scanned by {}", subPackage, beanScanner);
+                } while (tokenizer.hasMoreTokens());
             }
-
             List<String> packageToScanList = new ArrayList<>(packageToScanSet);
             String[] packagesToScan = packageToScanList.toArray(new String[packageToScanList.size()]);
             beanScanner.scan(packagesToScan);
@@ -67,5 +64,4 @@ public class ThriftClientBeanScannerConfigurer implements ApplicationContextAwar
             beanScanner.scan(basePackages);
         }
     }
-
 }

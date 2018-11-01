@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public class ThriftClientFactoryBean<T> implements FactoryBean<T>, InitializingBean {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientFactoryBean.class);
 
     private String beanName;
 
@@ -37,32 +37,30 @@ public class ThriftClientFactoryBean<T> implements FactoryBean<T>, InitializingB
     @SuppressWarnings("unchecked")
     public T getObject() throws Exception {
         if (beanClass.isInterface()) {
-            log.info("Prepare to generate proxy for {} with JDK", beanClass.getName());
+            LOGGER.info("Prepare to generate proxy for {} with JDK", beanClass.getName());
 
             ThriftClientInvocationHandler invocationHandler = new ThriftClientInvocationHandler(serviceSignature, clientClass, clientConstructor);
             return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?>[]{beanClass}, invocationHandler);
         } else {
-            log.info("Prepare to generate proxy for {} with Cglib", beanClass.getName());
+            LOGGER.info("Prepare to generate proxy for {} with Cglib", beanClass.getName());
 
             Enhancer enhancer = new Enhancer();
             enhancer.setSuperclass(beanClass);
             enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
             enhancer.setUseFactory(true);
 
-            MethodInterceptor callback = (target, method, args, methodProxy) -> {
-                return methodProxy.invokeSuper(target, args);
-            };
+            MethodInterceptor callback = (target, method, args, methodProxy)
+                    -> methodProxy.invokeSuper(target, args);
 
             enhancer.setCallback(callback);
             return (T) enhancer.create();
         }
-
     }
 
     @Override
     public Class<?> getObjectType() {
         if (Objects.isNull(beanClass) && StringUtils.isBlank(beanName)) {
-            log.warn("Bean class is not found");
+            LOGGER.warn("Bean class is not found");
             return null;
         }
 
@@ -78,7 +76,7 @@ public class ThriftClientFactoryBean<T> implements FactoryBean<T>, InitializingB
                 e.printStackTrace();
             }
         } else {
-            log.warn("Bean class is not found");
+            LOGGER.warn("Bean class is not found");
         }
 
         return null;
@@ -91,7 +89,7 @@ public class ThriftClientFactoryBean<T> implements FactoryBean<T>, InitializingB
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.info("Succeed to instantiate an instance of ThriftClientFactoryBean: {}", this);
+        LOGGER.info("Succeed to instantiate an instance of ThriftClientFactoryBean: {}", this);
     }
 
     public String getBeanName() {
