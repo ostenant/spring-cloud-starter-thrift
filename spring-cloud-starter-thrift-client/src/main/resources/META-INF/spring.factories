@@ -1,2 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.ostenant.rpc.thrift.server.ThriftClientAutoConfiguration
+io.ostenant.rpc.thrift.client.annotation.EnableThriftClient=\
+io.ostenant.rpc.thrift.client.ThriftClientAutoConfiguration
