@@ -1,20 +1,29 @@
 package io.ostenant.rpc.thrift.client.annotation;
 
-import io.ostenant.rpc.thrift.client.ThriftClientAutoConfiguration;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.ImportSelector;
-import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.cloud.commons.util.SpringFactoryImportSelector;
+import org.springframework.core.env.Environment;
 
-public class ThriftClientConfigurationSelector implements ImportSelector {
+import java.util.Set;
+
+public class ThriftClientConfigurationSelector extends SpringFactoryImportSelector<EnableThriftClient> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientConfigurationSelector.class);
 
-    @Override
-    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        String importClassName = ThriftClientAutoConfiguration.class.getName();
-        LOGGER.info("Auto import configuration class {}", importClassName);
+    private static final Set<String> SERVICE_MODEL_SET = Sets.newHashSet("simple",
+            "nonBlocking", "threadPool", "hsHa", "threadedSelector");
+    private static final String SERVICE_MODEL = "spring.thrift.client.service-model";
 
-        return new String[]{importClassName};
+    @Override
+    protected boolean isEnabled() {
+        Environment environment = getEnvironment();
+        String serviceModel = environment.getProperty(SERVICE_MODEL, String.class);
+        boolean enableAutoConfiguration = SERVICE_MODEL_SET.contains(serviceModel);
+        if (enableAutoConfiguration) {
+            LOGGER.info("Enable thrift client auto configuration, service model {}", serviceModel);
+        }
+        return enableAutoConfiguration;
     }
 }

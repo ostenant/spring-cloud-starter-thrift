@@ -36,15 +36,9 @@ public class ThriftServerDiscoveryConfiguration {
     private static final String REGISTRY_URL_TEMPLATE = "http://%s:%d";
     private static final String HEALTH_CHECK_URL_TEMPLATE = "%s:%d%s";
 
-    public static void main(String[] args) throws Exception {
-        String hostAddress = Inet4Address.getLocalHost().getHostAddress();
-        System.out.println(hostAddress);
-    }
-
     @Bean
     public Consul consulClient(ThriftServerProperties thriftServerProperties) throws UnknownHostException {
         ThriftServerDiscoveryProperties discoveryProperties = thriftServerProperties.getDiscovery();
-
         String discoveryHostAddress = discoveryProperties.getHost();
         Integer discoveryPort = discoveryProperties.getPort();
         LOGGER.info("Service discovery server host {}, port {}", discoveryHostAddress, discoveryPort);
@@ -73,15 +67,13 @@ public class ThriftServerDiscoveryConfiguration {
 
         Service service = ImmutableService.builder().id(serviceId).service(serviceName)
                 .address(serverHostAddress).port(servicePort)
-                .addAllTags(serviceTags)
-                .build();
+                .addAllTags(serviceTags).build();
 
         ImmutableCatalogRegistration.Builder catalogRegistrationBuilder = ImmutableCatalogRegistration.
                 builder().service(service).address(discoveryUrl).node(nodeName);
 
         ThriftServerHealthCheckProperties healthCheckProperties = discoveryProperties.getHealthCheck();
         Boolean healthCheckEnabled = healthCheckProperties.getEnabled();
-
         if (healthCheckEnabled) {
             String tcpCheckUrl = healthCheckProperties.getCheckTcp();
             Long checkInterval = healthCheckProperties.getCheckInterval();
@@ -92,15 +84,11 @@ public class ThriftServerDiscoveryConfiguration {
             LOGGER.info("Service health check interval {}s, timeout {}s", checkInterval, checkTimeout);
 
             Check check = ImmutableCheck.builder().id(serviceId).name(serviceName)
-                    .tcp(healthCheckUrl)
-                    .interval(String.valueOf(checkInterval) + "s")
-                    .build();
+                    .tcp(healthCheckUrl).interval(String.valueOf(checkInterval) + "s").build();
 
             agentClient.registerCheck(check);
         }
-
         catalogClient.register(catalogRegistrationBuilder.build());
-
         return consulClient;
     }
 }

@@ -71,5 +71,4 @@ public class ThriftClientAutoConfiguration {
             ThriftClientProperties properties, TransportKeyedObjectPool objectPool) {
         return ThriftClientContext.context(properties, objectPool);
     }
-
 }

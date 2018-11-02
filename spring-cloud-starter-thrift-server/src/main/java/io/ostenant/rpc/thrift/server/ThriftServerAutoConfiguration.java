@@ -57,7 +57,6 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
 
             ThriftService thriftService = bean.getClass().getAnnotation(ThriftService.class);
             String thriftServiceName = StringUtils.isEmpty(thriftService.value()) ? beanName : thriftService.value();
-
             if (target instanceof Advised) {
                 final Object targetBean = target;
                 TargetSource targetSource = ((Advised) target).getTargetSource();
@@ -70,10 +69,8 @@ public class ThriftServerAutoConfiguration implements ApplicationContextAware {
                 } catch (Exception e) {
                     throw new ThriftServerInstantiateException("Failed to get target bean from " + target, e);
                 }
-
                 return ThriftServiceWrapperFactory.wrapper(properties.getServiceId(), thriftServiceName, targetBean, thriftService.version());
             }
-
             return ThriftServiceWrapperFactory.wrapper(properties.getServiceId(), thriftServiceName, target, thriftService.version());
         }).collect(Collectors.toList());
 

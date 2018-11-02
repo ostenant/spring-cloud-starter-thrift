@@ -57,8 +57,7 @@ public class ThriftServerBootstrap implements SmartLifecycle {
 
     @Override
     public boolean isRunning() {
-        return thriftServerGroup.getServers().stream()
-                .anyMatch(TServer::isServing);
+        return thriftServerGroup.getServers().stream().anyMatch(TServer::isServing);
     }
 
     @Override
@@ -72,7 +71,6 @@ public class ThriftServerBootstrap implements SmartLifecycle {
 
         private TServer server;
 
-
         public ThriftRunner(TServer server) {
             this.server = server;
         }
@@ -85,5 +83,4 @@ public class ThriftServerBootstrap implements SmartLifecycle {
             }
         }
     }
-
 }
