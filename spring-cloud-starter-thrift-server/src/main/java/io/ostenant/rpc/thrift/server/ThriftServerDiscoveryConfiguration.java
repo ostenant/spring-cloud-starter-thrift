@@ -1,14 +1,10 @@
 package io.ostenant.rpc.thrift.server;
 
 import com.orbitz.consul.AgentClient;
-import com.orbitz.consul.CatalogClient;
 import com.orbitz.consul.Consul;
-import com.orbitz.consul.model.agent.Agent;
-import com.orbitz.consul.model.agent.Check;
-import com.orbitz.consul.model.agent.ImmutableCheck;
-import com.orbitz.consul.model.catalog.ImmutableCatalogRegistration;
-import com.orbitz.consul.model.health.ImmutableService;
-import com.orbitz.consul.model.health.Service;
+import com.orbitz.consul.model.agent.ImmutableRegCheck;
+import com.orbitz.consul.model.agent.ImmutableRegistration;
+import com.orbitz.consul.model.agent.Registration;
 import io.ostenant.rpc.thrift.server.properties.ThriftServerDiscoveryProperties;
 import io.ostenant.rpc.thrift.server.properties.ThriftServerHealthCheckProperties;
 import io.ostenant.rpc.thrift.server.properties.ThriftServerProperties;
@@ -34,7 +30,7 @@ public class ThriftServerDiscoveryConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThriftServerDiscoveryConfiguration.class);
 
     private static final String REGISTRY_URL_TEMPLATE = "http://%s:%d";
-    private static final String HEALTH_CHECK_URL_TEMPLATE = "%s:%d%s";
+    private static final String HEALTH_CHECK_URL_TEMPLATE = "%s:%d";
 
     @Bean
     public Consul consulClient(ThriftServerProperties thriftServerProperties) throws UnknownHostException {
@@ -59,36 +55,35 @@ public class ThriftServerDiscoveryConfiguration {
 
         String discoveryUrl = String.format(REGISTRY_URL_TEMPLATE, discoveryHostAddress, discoveryPort);
         Consul consulClient = Consul.builder().withUrl(discoveryUrl).build();
-        CatalogClient catalogClient = consulClient.catalogClient();
+        registerAgentService(discoveryProperties, serviceName, serverHostAddress, servicePort,
+                serviceId, serviceTags, consulClient);
+        return consulClient;
+    }
 
+    private void registerAgentService(ThriftServerDiscoveryProperties discoveryProperties, String serviceName,
+                                      String serverHostAddress, int servicePort, String serviceId,
+                                      List<String> serviceTags, Consul consulClient) {
         AgentClient agentClient = consulClient.agentClient();
-        Agent agent = agentClient.getAgent();
-        String nodeName = agent.getConfig().getNodeName();
+        ImmutableRegistration.Builder builder = ImmutableRegistration.builder();
+        builder.id(serviceId).name(serviceName).address(serverHostAddress)
+                .port(servicePort).tags(serviceTags).enableTagOverride(false);
+        registerHealthCheck(discoveryProperties, serverHostAddress, servicePort, builder);
+        agentClient.register(builder.build());
+    }
 
-        Service service = ImmutableService.builder().id(serviceId).service(serviceName)
-                .address(serverHostAddress).port(servicePort)
-                .addAllTags(serviceTags).build();
-
-        ImmutableCatalogRegistration.Builder catalogRegistrationBuilder = ImmutableCatalogRegistration.
-                builder().service(service).address(discoveryUrl).node(nodeName);
-
+    private void registerHealthCheck(ThriftServerDiscoveryProperties discoveryProperties, String serverHostAddress,
+                                     int servicePort, ImmutableRegistration.Builder builder) {
         ThriftServerHealthCheckProperties healthCheckProperties = discoveryProperties.getHealthCheck();
         Boolean healthCheckEnabled = healthCheckProperties.getEnabled();
+        String healthCheckUrl = String.format(HEALTH_CHECK_URL_TEMPLATE, serverHostAddress, servicePort);
+
         if (healthCheckEnabled) {
-            String tcpCheckUrl = healthCheckProperties.getCheckTcp();
             Long checkInterval = healthCheckProperties.getCheckInterval();
             Long checkTimeout = healthCheckProperties.getCheckTimeout();
-
-            String healthCheckUrl = String.format(HEALTH_CHECK_URL_TEMPLATE, serverHostAddress, servicePort, tcpCheckUrl);
             LOGGER.info("Service health check tcp url {}", healthCheckUrl);
             LOGGER.info("Service health check interval {}s, timeout {}s", checkInterval, checkTimeout);
-
-            Check check = ImmutableCheck.builder().id(serviceId).name(serviceName)
-                    .tcp(healthCheckUrl).interval(String.valueOf(checkInterval) + "s").build();
-
-            agentClient.registerCheck(check);
+            Registration.RegCheck regCheck = ImmutableRegCheck.tcp(healthCheckUrl, checkInterval, checkTimeout);
+            builder.check(regCheck);
         }
-        catalogClient.register(catalogRegistrationBuilder.build());
-        return consulClient;
     }
 }

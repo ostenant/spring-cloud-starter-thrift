@@ -11,17 +11,12 @@ public class ThriftServerHealthCheckProperties {
     private Boolean enabled = true;
 
     /**
-     * 服务健康检查路径
-     */
-    private String checkTcp = "";
-
-    /**
-     * 服务健康检查时间间隔
+     * 服务健康检查时间间隔 (默认30s)
      */
     private Long checkInterval = 30L;
 
     /**
-     * 服务健康检查超时时间
+     * 服务健康检查超时时间（默认3m）
      */
     private Long checkTimeout = 3L;
 
@@ -31,14 +26,6 @@ public class ThriftServerHealthCheckProperties {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public String getCheckTcp() {
-        return checkTcp;
-    }
-
-    public void setCheckTcp(String checkTcp) {
-        this.checkTcp = checkTcp;
     }
 
     public Long getCheckInterval() {
