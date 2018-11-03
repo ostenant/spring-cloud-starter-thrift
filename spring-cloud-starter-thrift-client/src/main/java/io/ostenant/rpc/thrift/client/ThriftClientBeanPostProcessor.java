@@ -21,7 +21,6 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ThriftClientBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware {
 
@@ -141,7 +140,7 @@ public class ThriftClientBeanPostProcessor implements BeanPostProcessor, Applica
                         .map(Map.Entry::getValue)
                         .orElseThrow(() -> new ThriftClientInstantiateException(
                                 "Detected non-qualified bean of {}" + parameterType.getSimpleName()));
-            }).collect(Collectors.toList()).toArray();
+            }).toArray();
 
             ReflectionUtils.makeAccessible(method);
             ReflectionUtils.invokeMethod(method, targetBean, objectArray);
@@ -154,5 +153,4 @@ public class ThriftClientBeanPostProcessor implements BeanPostProcessor, Applica
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
-
 }

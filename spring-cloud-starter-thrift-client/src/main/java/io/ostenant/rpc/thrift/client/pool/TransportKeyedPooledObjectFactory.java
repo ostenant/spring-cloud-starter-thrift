@@ -97,5 +97,4 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
             value.markAbandoned();
         }
     }
-
 }

@@ -15,5 +15,4 @@ public @interface ThriftRefer {
 
     @AliasFor("value")
     String name() default "";
-
 }

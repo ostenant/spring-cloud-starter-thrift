@@ -72,5 +72,4 @@ public class TRegisterProcessorFactory {
             LOGGER.info("Single processor {} register onto multiplexed processor with signature [{}]", singleProcessor, serviceSignature);
         }
     }
-
 }

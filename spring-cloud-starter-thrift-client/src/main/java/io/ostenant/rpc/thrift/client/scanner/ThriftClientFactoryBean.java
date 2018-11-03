@@ -38,20 +38,16 @@ public class ThriftClientFactoryBean<T> implements FactoryBean<T>, InitializingB
     public T getObject() throws Exception {
         if (beanClass.isInterface()) {
             LOGGER.info("Prepare to generate proxy for {} with JDK", beanClass.getName());
-
             ThriftClientInvocationHandler invocationHandler = new ThriftClientInvocationHandler(serviceSignature, clientClass, clientConstructor);
             return (T) Proxy.newProxyInstance(beanClass.getClassLoader(), new Class<?>[]{beanClass}, invocationHandler);
         } else {
             LOGGER.info("Prepare to generate proxy for {} with Cglib", beanClass.getName());
-
             Enhancer enhancer = new Enhancer();
             enhancer.setSuperclass(beanClass);
             enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
             enhancer.setUseFactory(true);
-
             MethodInterceptor callback = (target, method, args, methodProxy)
                     -> methodProxy.invokeSuper(target, args);
-
             enhancer.setCallback(callback);
             return (T) enhancer.create();
         }

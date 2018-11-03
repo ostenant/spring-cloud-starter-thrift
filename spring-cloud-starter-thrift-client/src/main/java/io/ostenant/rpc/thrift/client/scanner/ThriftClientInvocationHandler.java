@@ -57,5 +57,4 @@ public class ThriftClientInvocationHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         return proxyFactoryBean.getObject();
     }
-
 }

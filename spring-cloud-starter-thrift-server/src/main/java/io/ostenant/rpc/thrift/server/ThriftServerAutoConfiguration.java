@@ -1,12 +1,10 @@
 package io.ostenant.rpc.thrift.server;
 
-import com.orbitz.consul.Consul;
 import io.ostenant.rpc.thrift.server.annotation.ThriftService;
 import io.ostenant.rpc.thrift.server.context.AbstractThriftServerContext;
 import io.ostenant.rpc.thrift.server.context.ThriftServerContext;
 import io.ostenant.rpc.thrift.server.exception.ThriftServerException;
 import io.ostenant.rpc.thrift.server.exception.ThriftServerInstantiateException;
-import io.ostenant.rpc.thrift.server.properties.ThriftServerDiscoveryProperties;
 import io.ostenant.rpc.thrift.server.properties.ThriftServerProperties;
 import io.ostenant.rpc.thrift.server.wrapper.ThriftServiceWrapper;
 import io.ostenant.rpc.thrift.server.wrapper.ThriftServiceWrapperFactory;

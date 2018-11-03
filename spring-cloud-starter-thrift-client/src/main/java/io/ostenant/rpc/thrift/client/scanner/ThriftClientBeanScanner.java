@@ -29,7 +29,7 @@ import java.util.Set;
 
 public final class ThriftClientBeanScanner extends ClassPathBeanDefinitionScanner {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientBeanScanner.class);
 
     public ThriftClientBeanScanner(BeanDefinitionRegistry registry) {
         super(registry);
@@ -43,13 +43,13 @@ public final class ThriftClientBeanScanner extends ClassPathBeanDefinitionScanne
     @Override
     protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> definitionHolders = super.doScan(basePackages);
-        log.info("Packages scanned by thriftClientBeanDefinitionScanner is [{}]",
+        LOGGER.info("Packages scanned by thriftClientBeanDefinitionScanner is [{}]",
                 StringUtils.join(basePackages, ", "));
 
         for (BeanDefinitionHolder definitionHolder : definitionHolders) {
             GenericBeanDefinition definition = (GenericBeanDefinition) definitionHolder.getBeanDefinition();
 
-            log.info("Scanned and found thrift client, bean {} assigned from {}",
+            LOGGER.info("Scanned and found thrift client, bean {} assigned from {}",
                     definitionHolder.getBeanName(),
                     definition.getBeanClassName());
 
@@ -63,7 +63,7 @@ public final class ThriftClientBeanScanner extends ClassPathBeanDefinitionScanne
 
             ThriftClient thriftClient = AnnotationUtils.findAnnotation(beanClass, ThriftClient.class);
             if (thriftClient == null) {
-                log.warn("Thrift client is not found");
+                LOGGER.warn("Thrift client is not found");
                 continue;
             }
 
@@ -87,14 +87,13 @@ public final class ThriftClientBeanScanner extends ClassPathBeanDefinitionScanne
             try {
                 constructor = clientClass.getConstructor(TProtocol.class);
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
                 throw new ThriftClientInstantiateException("Failed to get constructor with args TProtocol", e);
             }
 
             definition.getPropertyValues().addPropertyValue(ThriftClientDefinitionProperty.SERVICE_SIGNATURE, serviceSignature);
             definition.getPropertyValues().addPropertyValue(ThriftClientDefinitionProperty.CLIENT_CLASS, clientClass);
             definition.getPropertyValues().addPropertyValue(ThriftClientDefinitionProperty.CLIENT_CONSTRUCTOR, constructor);
-
             definition.setBeanClass(ThriftClientFactoryBean.class);
         }
 
@@ -128,6 +127,4 @@ public final class ThriftClientBeanScanner extends ClassPathBeanDefinitionScanne
         return metadata.hasAnnotation(ThriftClient.class.getName())
                 && metadata.isInterface();
     }
-
-
 }

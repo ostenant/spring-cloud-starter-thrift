@@ -97,5 +97,4 @@ public class ThriftConsulServerListLoadBalancer extends AbstractLoadBalancer {
         sb.append("ServerList:").append(String.valueOf(serverNodeList));
         return sb.toString();
     }
-
 }
