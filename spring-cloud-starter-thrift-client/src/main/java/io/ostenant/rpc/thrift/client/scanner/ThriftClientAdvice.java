@@ -38,6 +38,7 @@ import java.util.Objects;
 public class ThriftClientAdvice implements MethodInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientAdvice.class);
+    private static final String DISCOVERY_ADDRESS = "http://%s";
 
     private ThriftServiceSignature serviceSignature;
 
@@ -57,9 +58,7 @@ public class ThriftClientAdvice implements MethodInterceptor {
         String consulAddress = ThriftClientContext.context().getRegistryAddress();
         Consul consul;
         try {
-            consul = Consul.builder()
-                    .withUrl(String.format("http://%s", consulAddress))
-                    .build();
+            consul = Consul.builder().withUrl(String.format(DISCOVERY_ADDRESS, consulAddress)).build();
         } catch (Exception e) {
             throw new ThriftClientRegistryException("Unable to access consul server, address is: " + consulAddress, e);
         }
