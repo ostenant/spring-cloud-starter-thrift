@@ -21,3 +21,12 @@ spring:
         selector-threads: 40
         min-worker-threads: 100
         max-worker-threads: 400
+      discovery:
+        enabled: true
+        tags:
+          - test-server
+          - threadedSelector
+        health-check:
+          enabled: true
+          check-interval: 30
+          check-timeout: 3

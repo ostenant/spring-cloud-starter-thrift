@@ -12,7 +12,7 @@ management:
 spring:
   cloud:
     consul:
-      host: 192.168.2.3 #192.168.127.131
+      host: localhost
       port: 8500
       discovery:
         register: false

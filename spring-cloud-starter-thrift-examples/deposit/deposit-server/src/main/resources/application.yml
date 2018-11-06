@@ -26,6 +26,15 @@ spring:
         min-worker-threads: 5
         max-worker-threads: 20
         keep-alived-time: 3
+      discovery:
+        enabled: true
+        tags:
+          - deposit-server
+          - hsHa
+        health-check:
+          enabled: true
+          check-interval: 30
+          check-timeout: 3
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -34,8 +43,8 @@ mybatis:
 logging:
   level:
     root: INFO
-    com:
-      icekredit:
+    io:
+      ostenant:
         rpc:
           thrift:
             examples:

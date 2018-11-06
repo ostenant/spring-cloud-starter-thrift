@@ -20,10 +20,9 @@ import java.util.stream.LongStream;
 @RestController
 public class TestApiController {
 
-    private final RestTemplate restTemplate;
-
     private final ExecutorService executors = Executors.newFixedThreadPool(10);
-
+    private final RestTemplate restTemplate;
+    
     @Autowired
     public TestApiController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -113,6 +112,4 @@ public class TestApiController {
         return statisticsArray.toJSONString();
 
     }
-
-
 }

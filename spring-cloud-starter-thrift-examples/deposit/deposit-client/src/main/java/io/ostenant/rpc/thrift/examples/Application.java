@@ -1,5 +1,6 @@
 package io.ostenant.rpc.thrift.examples;
 
+import io.ostenant.rpc.thrift.client.annotation.EnableThriftClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -13,10 +14,11 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication
-@EnableFeignClients
-@EnableDiscoveryClient
 @EnableSwagger2
+@EnableFeignClients
+@EnableThriftClient
+@EnableDiscoveryClient
+@SpringBootApplication
 public class Application {
 
     public static void main(String[] args) {
@@ -28,7 +30,7 @@ public class Application {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.icekredit.rpc.thrift.examples"))
+                .apis(RequestHandlerSelectors.basePackage("io.ostenant.rpc.thrift.examples"))
                 .paths(PathSelectors.any())
                 .build();
     }

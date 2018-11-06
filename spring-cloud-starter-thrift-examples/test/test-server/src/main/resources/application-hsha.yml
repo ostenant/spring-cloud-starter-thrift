@@ -20,3 +20,12 @@ spring:
         min-worker-threads: 2
         max-worker-threads: 20
         keep-alived-time: 1000000
+      discovery:
+        enabled: true
+        tags:
+          - test-server
+          - hsHa
+        health-check:
+          enabled: true
+          check-interval: 30
+          check-timeout: 3
