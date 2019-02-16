@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9091
 
 endpoints:
   health:
@@ -22,11 +22,15 @@ spring:
         service-name: test-server-rest
         instance-id: ${spring.cloud.consul.discovery.service-name}:${spring.cloud.client.ipAddress}:${server.port}
         prefer-ip-address: true
+        tags:
+          - threadedselector
+          - http
+          - test-server
   thrift:
     server:
       service-id: test-server-rpc
       service-model: threadedSelector
-      port: 25000
+      port: 25001
       worker-queue-capacity: 10000
       threaded-selector:
         accept-queue-size-per-thread: 10000
@@ -38,8 +42,9 @@ spring:
         host: localhost
         port: 8500
         tags:
+          - threadedselector
+          - thrift
           - test-server
-          - threadedSelector
         health-check:
           enabled: true
           check-interval: 10

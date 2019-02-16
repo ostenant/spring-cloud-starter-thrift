@@ -2,7 +2,10 @@ package io.ostenant.rpc.thrift.examples.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,14 +18,23 @@ import java.util.LongSummaryStatistics;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.LongStream;
 
 @RestController
 public class TestApiController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestApiController.class);
+
+    private static final AtomicLong REST_COUNTER = new AtomicLong(0);
+    private static final AtomicLong RPC_COUNTER = new AtomicLong(0);
+
     private final ExecutorService executors = Executors.newFixedThreadPool(10);
     private final RestTemplate restTemplate;
-    
+
+    @Value("${client.ports}")
+    private int[] clientPort;
+
     @Autowired
     public TestApiController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -32,8 +44,13 @@ public class TestApiController {
     public String testRest(@RequestParam("length") int length,
                            @RequestParam("times") int times,
                            @RequestParam("concurrency") int concurrency) throws Exception {
+        final long counter = REST_COUNTER.getAndIncrement();
+        final int port = clientPort[(int) (counter % clientPort.length)];
+
+        LOGGER.info("The {} times to access '/api/rest', selected port is {}", counter, port);
+
         final String restUri = UriComponentsBuilder.newInstance()
-                .scheme("http").host("localhost").port(9000)
+                .scheme("http").host("localhost").port(port)
                 .path("/rest/test")
                 .queryParam("length", length)
                 .build().toUriString();
@@ -74,8 +91,13 @@ public class TestApiController {
     public String testRpc(@RequestParam("length") int length,
                           @RequestParam("times") int times,
                           @RequestParam("concurrency") int concurrency) throws Exception {
+        final long counter = RPC_COUNTER.getAndIncrement();
+        final int port = clientPort[(int) (counter % clientPort.length)];
+
+        LOGGER.info("The {} times to access '/api/rpc', selected port is {}", counter, port);
+
         final String rpcUri = UriComponentsBuilder.newInstance()
-                .scheme("http").host("localhost").port(9000)
+                .scheme("http").host("localhost").port(port)
                 .path("/rpc/test")
                 .queryParam("length", length)
                 .build().toUriString();

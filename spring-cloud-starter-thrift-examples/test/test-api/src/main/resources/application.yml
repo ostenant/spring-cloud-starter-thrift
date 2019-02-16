@@ -1,2 +1,4 @@
 server:
-  port: 80
+  port: 10000
+client:
+  ports: 8080,8081

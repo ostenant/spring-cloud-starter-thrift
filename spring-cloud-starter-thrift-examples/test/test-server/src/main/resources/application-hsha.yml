@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9090
 
 endpoints:
   health:
@@ -22,6 +22,10 @@ spring:
         service-name: test-server-rest
         instance-id: ${spring.cloud.consul.discovery.service-name}:${spring.cloud.client.ipAddress}:${server.port}
         prefer-ip-address: true
+        tags:
+          - hsha
+          - http
+          - test-server
   thrift:
     server:
       service-id: test-server-rpc
@@ -37,8 +41,9 @@ spring:
         host: localhost
         port: 8500
         tags:
+          - hsha
+          - thrift
           - test-server
-          - hsHa
         health-check:
           enabled: true
           check-interval: 10

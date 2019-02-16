@@ -15,9 +15,17 @@ spring:
       host: localhost
       port: 8500
       discovery:
-        register: false
+        register: true
         register-health-check: true
-        health-check-interval: 30s
+        health-check-interval: 10s
+        health-check-path: /health
+        service-name: test-client-rest
+        instance-id: ${spring.cloud.consul.discovery.service-name}:${spring.cloud.client.ipAddress}:${server.port}
+        prefer-ip-address: true
+        tags:
+          - hsha
+          - http
+          - test-client
       retry:
         max-attempts: 3
         max-interval: 2000

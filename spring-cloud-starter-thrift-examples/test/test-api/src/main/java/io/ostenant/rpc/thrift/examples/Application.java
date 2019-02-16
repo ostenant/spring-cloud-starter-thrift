@@ -30,7 +30,7 @@ public class Application {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.icekredit.rpc.thrift.examples.controller"))
+                .apis(RequestHandlerSelectors.basePackage("io.ostenant.rpc.thrift.examples"))
                 .paths(PathSelectors.any())
                 .build();
     }
