@@ -1,3 +1,5 @@
 spring:
   profiles:
     active: threadedselector
+  application:
+    name: test-server

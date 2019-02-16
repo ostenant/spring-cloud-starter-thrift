@@ -36,7 +36,7 @@ public class ThriftConsulServerListUpdater implements ServerListUpdater {
         private static final int CORE_THREAD = 2;
         private static Thread shutdownThread;
 
-        static ScheduledThreadPoolExecutor serverListRefreshExecutor = null;
+        static ScheduledThreadPoolExecutor serverListRefreshExecutor;
 
         static {
             ThreadFactory factory = new ThreadFactoryBuilder()

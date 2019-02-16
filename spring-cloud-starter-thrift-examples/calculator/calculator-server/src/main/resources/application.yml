@@ -1,11 +1,14 @@
-endpoints:
-  actuator:
-    sensitive: false
-    enabled: true
 management:
   security:
     enabled: false
+endpoints:
+  health:
+    sensitive: false
+    enabled: true
+
 spring:
   profiles:
     active: 25000
+  application:
+    name: calculator-server
 

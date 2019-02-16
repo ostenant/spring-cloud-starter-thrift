@@ -2,7 +2,7 @@ server:
   port: 8080
 
 endpoints:
-  actuator:
+  health:
     sensitive: false
     enabled: true
 management:
@@ -10,6 +10,18 @@ management:
     enabled: false
 
 spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        register: true
+        register-health-check: true
+        health-check-interval: 10s
+        health-check-path: /health
+        service-name: test-server-rest
+        instance-id: ${spring.cloud.consul.discovery.service-name}:${spring.cloud.client.ipAddress}:${server.port}
+        prefer-ip-address: true
   thrift:
     server:
       service-id: test-server-rpc
@@ -23,10 +35,12 @@ spring:
         max-worker-threads: 400
       discovery:
         enabled: true
+        host: localhost
+        port: 8500
         tags:
           - test-server
           - threadedSelector
         health-check:
           enabled: true
-          check-interval: 30
+          check-interval: 10
           check-timeout: 3

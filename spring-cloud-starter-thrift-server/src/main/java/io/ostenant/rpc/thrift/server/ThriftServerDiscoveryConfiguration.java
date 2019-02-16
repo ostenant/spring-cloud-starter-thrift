@@ -33,7 +33,7 @@ public class ThriftServerDiscoveryConfiguration {
     private static final String HEALTH_CHECK_URL_TEMPLATE = "%s:%d";
 
     @Bean
-    public Consul consulClient(ThriftServerProperties thriftServerProperties) throws UnknownHostException {
+    public Consul thriftConsulClient(ThriftServerProperties thriftServerProperties) throws UnknownHostException {
         ThriftServerDiscoveryProperties discoveryProperties = thriftServerProperties.getDiscovery();
         String discoveryHostAddress = discoveryProperties.getHost();
         Integer discoveryPort = discoveryProperties.getPort();

@@ -2,7 +2,7 @@ server:
   port: 8080
 
 endpoints:
-  actuator:
+  health:
     sensitive: false
     enabled: true
 management:
@@ -12,12 +12,16 @@ management:
 spring:
   cloud:
     consul:
-      host: 127.0.0.1
+      host: localhost
       port: 8500
       discovery:
         register: false
         register-health-check: true
-        health-check-interval: 30s
+        health-check-interval: 10s
+        health-check-path: /health
+        service-name: deposit-client-rest
+        instance-id: ${spring.cloud.consul.discovery.service-name}:${spring.cloud.client.ipAddress}:${server.port}
+        prefer-ip-address: true
       retry:
         max-attempts: 3
         max-interval: 2000

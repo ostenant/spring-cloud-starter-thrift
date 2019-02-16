@@ -2,6 +2,21 @@ server:
   port: 8080
 
 spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        register: true
+        register-health-check: true
+        health-check-interval: 10s
+        tags:
+          - calculator-8080
+          - http
+        health-check-path: /health
+        service-name: thrift-calculator-rest-server
+        instance-id: ${spring.cloud.consul.discovery.service-name}:${spring.cloud.client.ipAddress}:${server.port}
+        prefer-ip-address: true
   thrift:
     server:
       service-id: thrift-calculator-rpc-server
@@ -14,7 +29,7 @@ spring:
         keep-alived-time: 5
       discovery:
         enabled: true
-        host: 127.0.0.1
+        host: localhost
         port: 8500
         tags:
           - hsHa
