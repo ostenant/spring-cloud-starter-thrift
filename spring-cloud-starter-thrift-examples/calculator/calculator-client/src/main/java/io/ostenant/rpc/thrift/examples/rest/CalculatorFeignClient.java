@@ -5,7 +5,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(serviceId = "thrift-calculator-rest-server")
+@FeignClient(name = "thrift-calculator-rest-server")
 public interface CalculatorFeignClient extends ICalculatorService {
 
     @Override

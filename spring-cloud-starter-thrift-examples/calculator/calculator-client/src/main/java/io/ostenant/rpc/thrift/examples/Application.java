@@ -17,3 +17,7 @@ public class Application {
     }
 
 }
+// java -jar target/calculator-server-1.0.0.jar --spring.profiles.active=25000
+// java -jar target/calculator-server-1.0.0.jar --spring.profiles.active=25001
+// java -jar target/calculator-server-1.0.0.jar --spring.profiles.active=25002
+// java -jar target/calculator-client-1.0.0.jar --spring.profiles.active=8080
